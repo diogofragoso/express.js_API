@@ -1,0 +1,25 @@
+Fluxo Rápido (Local/Dev - SEM gerar arquivo de migration):
+1 - npx prisma contract emit
+2 - npx prisma db update
+3 - npx prisma@8.0.0-rc.15 skills sync
+
+
+Fluxo Formal (Produção - COM geração de arquivo de migration):
+1 - npx prisma contract emit
+2 - npx prisma migration plan --name nome_direnteAqui_Sempre
+3 - npx prisma db migrate
+
+Sincronizar IA do Prisma:
+1 - npx prisma skills sync
+
+
+Neon --> Prisma
+ 1 - npx prisma contract infer
+ 2 - npx prisma contract emit
+ 3 - npx prisma db sign
+
+ 
+
+ ############### Instalação de bibliotecas #######################
+
+ npm install temporal-polyfill

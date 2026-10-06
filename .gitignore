@@ -1,0 +1,10 @@
+# Arquivo: .gitignore
+node_modules/
+dist/
+coverage/
+logs/
+cookies.txt
+.env
+.env.*
+!.env.example
+all.log
