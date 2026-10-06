@@ -389,12 +389,13 @@ import { beforeEach, expect, it, vi } from 'vitest';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 
+const users = vi.hoisted(() => ({ first: vi.fn() }));
 const contacts = vi.hoisted(() => ({
   create: vi.fn(), first: vi.fn(), all: vi.fn(), update: vi.fn(), delete: vi.fn(),
 }));
 vi.mock('../src/prisma/db.js', () => ({
   db: { orm: { public: {
-    User: {},
+    User: { first: users.first },
     Cliente: {
       create: contacts.create, first: contacts.first, all: contacts.all,
       where: () => ({ update: contacts.update, delete: contacts.delete }),
@@ -410,6 +411,7 @@ const bearer = () => `Bearer ${jwt.sign({ id: 1 }, env.JWT_SECRET, {
 })}`;
 beforeEach(() => {
   vi.resetAllMocks();
+  users.first.mockResolvedValue({ id: 1 });
   contacts.create.mockImplementation(async data => ({ ...record, ...data }));
   contacts.first.mockResolvedValue(record);
   contacts.all.mockResolvedValue([record]);
