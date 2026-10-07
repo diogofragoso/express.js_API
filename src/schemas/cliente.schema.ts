@@ -8,8 +8,9 @@ export const idParams = z.object({
 });
 
 export const createCliente = z.object({
-  nomeCliente: z.string().trim().min(2).max(100).optional(),
-  emailCliente: z.string().trim().toLowerCase().max(254).pipe(z.email()),
+  name: z.string().trim().min(2).max(100),
+  email: z.string().trim().toLowerCase().max(254).pipe(z.email()),
+  telefones: z.array(z.string().min(8).max(15)).min(1, 'É necessário informar pelo menos um telefone')
 }).strict();
 
 export const updateCliente = createCliente.partial().refine(

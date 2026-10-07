@@ -13,23 +13,28 @@ const router = Router();
  *     PublicCliente:
  *       type: object
  *       properties:
- *         idCliente: { type: integer, minimum: 1 }
- *         nomeCliente: { type: string, nullable: true }
- *         emailCliente: { type: string, format: email, nullable: true }
+ *         id: { type: integer, minimum: 1 }
+ *         name: { type: string, nullable: true }
+ *         email: { type: string, format: email, nullable: true }
+ *         telefones: { type: array, items: { type: string } }
  *     CreateCliente:
  *       type: object
  *       additionalProperties: false
- *       required: [emailCliente]
+ *       required: [email, name, telefones]
  *       properties:
- *         nomeCliente: { type: string, minLength: 2, maxLength: 100 }
- *         emailCliente: { type: string, format: email, maxLength: 254 }
+ *         name: { type: string, minLength: 2, maxLength: 100 }
+ *         email: { type: string, format: email, maxLength: 254 }
+ *         telefones:
+ *           type: array
+ *           items: { type: string, minLength: 8, maxLength: 15 }
+ *           minItems: 1
  *     UpdateCliente:
  *       type: object
  *       additionalProperties: false
  *       minProperties: 1
  *       properties:
- *         nomeCliente: { type: string, minLength: 2, maxLength: 100 }
- *         emailCliente: { type: string, format: email, maxLength: 254 }
+ *         name: { type: string, minLength: 2, maxLength: 100 }
+ *         email: { type: string, format: email, maxLength: 254 }
  * /clientes:
  *   post:
  *     summary: Cadastrar um cliente

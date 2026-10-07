@@ -98,7 +98,6 @@ Neste arquivo, `import 'dotenv/config'` carrega `.env` para `process.env`, que �
 **Propósito do passo:** Emitir significa transformar o contrato em arquivos que a aplicação consegue ler e que o TypeScript consegue conferir. Sincronizar skills atualiza instruções auxiliares para agentes de programação; são duas tarefas diferentes, e nenhuma delas cria tabelas.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run contract:emit
 npm run skills:sync
 ```
@@ -152,14 +151,12 @@ Todos os serviços importarão este módulo, compartilhando o cliente no mesmo p
 Execute **uma linha por vez**, sem acrescentar numeração:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npx prisma migration plan --name init
 ```
 
 Revise a pasta criada em `migrations/app/`. O plano inicial deve criar a tabela de usuários, chave primária e unicidade de e-mail. O contrato ainda não foi aplicado apenas por existir um plano.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npx prisma db migrate --advance-ref db
 npx prisma db verify
 npx prisma migration status
@@ -182,7 +179,6 @@ A pasta de migração contém o plano e os registros da estrutura usada para cal
 Pare `npm run dev` com Ctrl+C antes de iniciar outro servidor na mesma porta.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run typecheck
 npm run build
 npm start
@@ -191,7 +187,6 @@ npm start
 Em outro terminal:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i http://localhost:3000/health
 ```
 
@@ -202,7 +197,6 @@ Espere 200. Confira também `dist/prisma/contract.json`: `tsc` copia o JSON impo
 **Propósito do passo:** Sempre que um modelo mudar, os tipos e a estrutura do banco precisam acompanhar a mudança. Repetir este ciclo mantém o contrato, a aplicação e o banco descrevendo a mesma estrutura.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run contract:emit
 npx prisma migration plan --name descreva_a_mudanca
 ```
@@ -210,7 +204,6 @@ npx prisma migration plan --name descreva_a_mudanca
 Revise o plano antes de continuar:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npx prisma db migrate --advance-ref db
 npx prisma db verify
 npm run typecheck
@@ -225,7 +218,6 @@ Não planeje duas mudanças sucessivas sem aplicar a anterior ou selecionar expl
 Esta é uma **alternativa**, não uma continuação do exercício. Trabalhe em uma cópia de desenvolvimento e faça backup antes de mudanças estruturais.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npx prisma contract infer
 npm run contract:emit
 npx prisma db sign

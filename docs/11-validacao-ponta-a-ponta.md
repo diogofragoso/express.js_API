@@ -17,7 +17,6 @@ Pare servidores duplicados e execute na raiz da API construída:
 Volte aos terminais que executam o servidor e pressione Ctrl+C. Os comandos abaixo devem ser executados um de cada vez em um CMD aberto na pasta da API. Não avance para o seguinte se o anterior terminar com erro; use a mensagem e o diagnóstico ao final deste capítulo para localizar a causa.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run contract:emit
 npm run typecheck
 npm test
@@ -43,7 +42,6 @@ npx prisma migration status
 Confira `.env.test`, inclusive `DIRECT_URL` quando usada. Aplique as migrações, agora também com `Cliente`:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 node --env-file=.env.test ./node_modules/prisma/dist/prisma.js db migrate
 node --env-file=.env.test ./node_modules/prisma/dist/prisma.js db verify
 npm run test:integration
@@ -56,14 +54,12 @@ Espere o fluxo de usuários aprovado, sem registros de teste remanescentes. O CR
 **Propósito do passo:** A versão compilada é a que será executada fora do modo de desenvolvimento. Vamos iniciar essa versão e repetir operações com dados descartáveis.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm start
 ```
 
 Em outro CMD:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i http://localhost:3000/health
 curl.exe -i http://localhost:3000/api-docs.json
 ```
@@ -117,7 +113,6 @@ Se criou o arquivo de cookies do capítulo 5, acrescente `cookies.txt` ao `.giti
 **Versionar** significa guardar os arquivos no histórico do Git para reconstruir o projeto depois. `git status --short` lista alterações; `git check-ignore` mostra quais caminhos são ignorados. Se você ainda não usa Git, não execute esses comandos agora: confira `.gitignore` no editor e guarde os arquivos de fonte, contratos e migrações listados acima para a etapa de versionamento.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 git status --short
 git check-ignore .env .env.test node_modules dist logs coverage
 ```
@@ -149,7 +144,6 @@ Faça o build em uma etapa que tenha as dependências de desenvolvimento instala
 Fluxo de referência para uma cópia limpa da **API já construída e versionada**:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm ci
 npm run typecheck
 npm test

@@ -8,12 +8,12 @@
       "model": "Cliente",
       "namespace": "public"
     },
-    "tel_cliente": {
-      "model": "TelCliente",
+    "estudante": {
+      "model": "Estudante",
       "namespace": "public"
     },
-    "teste": {
-      "model": "Teste",
+    "tel_cliente": {
+      "model": "TelCliente",
       "namespace": "public"
     },
     "user": {
@@ -27,22 +27,29 @@
         "models": {
           "Cliente": {
             "fields": {
-              "emailCliente": {
-                "nullable": true,
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "email": {
+                "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
-              "idCliente": {
+              "id": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
-              "nomeCliente": {
-                "nullable": true,
+              "name": {
+                "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -54,10 +61,10 @@
                 "cardinality": "1:N",
                 "on": {
                   "localFields": [
-                    "idCliente"
+                    "id"
                   ],
                   "targetFields": [
-                    "idCliente"
+                    "idTelClienteFk"
                   ]
                 },
                 "to": {
@@ -68,33 +75,94 @@
             },
             "storage": {
               "fields": {
-                "emailCliente": {
-                  "column": "email_cliente"
+                "createdAt": {
+                  "column": "createdAt"
                 },
-                "idCliente": {
-                  "column": "id_cliente"
+                "email": {
+                  "column": "email"
                 },
-                "nomeCliente": {
-                  "column": "nome_cliente"
+                "id": {
+                  "column": "id"
+                },
+                "name": {
+                  "column": "name"
                 }
               },
               "namespaceId": "public",
               "table": "cliente"
             }
           },
-          "TelCliente": {
+          "Estudante": {
             "fields": {
-              "idCliente": {
-                "nullable": true,
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "emailEstudante": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
-              "idTelCliente": {
+              "nomeEstudante": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "created_at"
+                },
+                "emailEstudante": {
+                  "column": "email_estudante"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "nomeEstudante": {
+                  "column": "nome_estudante"
+                }
+              },
+              "namespaceId": "public",
+              "table": "estudante"
+            }
+          },
+          "TelCliente": {
+            "fields": {
+              "id": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "idTelClienteFk": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "telCliente": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               }
@@ -102,13 +170,13 @@
             "relations": {
               "cliente": {
                 "cardinality": "N:1",
-                "nullable": true,
+                "nullable": false,
                 "on": {
                   "localFields": [
-                    "idCliente"
+                    "idTelClienteFk"
                   ],
                   "targetFields": [
-                    "idCliente"
+                    "id"
                   ]
                 },
                 "to": {
@@ -119,46 +187,18 @@
             },
             "storage": {
               "fields": {
-                "idCliente": {
-                  "column": "id_cliente"
+                "id": {
+                  "column": "id"
                 },
-                "idTelCliente": {
-                  "column": "id_tel_cliente"
+                "idTelClienteFk": {
+                  "column": "id_tel_cliente_fk"
+                },
+                "telCliente": {
+                  "column": "tel_cliente"
                 }
               },
               "namespaceId": "public",
               "table": "tel_cliente"
-            }
-          },
-          "Teste": {
-            "fields": {
-              "idTeste": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/int4@1",
-                  "kind": "scalar"
-                }
-              },
-              "nomeTeste": {
-                "nullable": true,
-                "type": {
-                  "codecId": "sql/varchar@1",
-                  "kind": "scalar"
-                }
-              }
-            },
-            "relations": {},
-            "storage": {
-              "fields": {
-                "idTeste": {
-                  "column": "id_Teste"
-                },
-                "nomeTeste": {
-                  "column": "nome_test"
-                }
-              },
-              "namespaceId": "public",
-              "table": "teste"
             }
           },
           "User": {
@@ -233,12 +273,21 @@
           "table": {
             "cliente": {
               "columns": {
-                "email_cliente": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "email": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
-                  "nullable": true
+                  "nullable": false
                 },
-                "id_cliente": {
+                "id": {
                   "codecId": "pg/int4@1",
                   "default": {
                     "expression": "autoincrement()",
@@ -247,37 +296,46 @@
                   "nativeType": "int4",
                   "nullable": false
                 },
-                "nome_cliente": {
+                "name": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
-                  "nullable": true
+                  "nullable": false
                 }
               },
               "foreignKeys": [],
               "indexes": [],
               "primaryKey": {
                 "columns": [
-                  "id_cliente"
+                  "id"
                 ],
                 "name": "cliente_pkey"
               },
               "uniques": [
                 {
                   "columns": [
-                    "email_cliente"
+                    "email"
                   ],
                   "name": "cliente_email_key"
                 }
               ]
             },
-            "tel_cliente": {
+            "estudante": {
               "columns": {
-                "id_cliente": {
-                  "codecId": "pg/int4@1",
-                  "nativeType": "int4",
-                  "nullable": true
+                "created_at": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false
                 },
-                "id_tel_cliente": {
+                "email_estudante": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
                   "codecId": "pg/int4@1",
                   "default": {
                     "expression": "autoincrement()",
@@ -285,21 +343,60 @@
                   },
                   "nativeType": "int4",
                   "nullable": false
+                },
+                "nome_estudante": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ],
+                "name": "estudante_pkey"
+              },
+              "uniques": []
+            },
+            "tel_cliente": {
+              "columns": {
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "id_tel_cliente_fk": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "tel_cliente": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
                 }
               },
               "foreignKeys": [
                 {
-                  "name": "cliente_fk",
+                  "name": "tel_cliente_fk",
+                  "onDelete": "restrict",
+                  "onUpdate": "restrict",
                   "source": {
                     "columns": [
-                      "id_cliente"
+                      "id_tel_cliente_fk"
                     ],
                     "namespaceId": "public",
                     "tableName": "tel_cliente"
                   },
                   "target": {
                     "columns": [
-                      "id_cliente"
+                      "id"
                     ],
                     "namespaceId": "public",
                     "tableName": "cliente"
@@ -309,36 +406,9 @@
               "indexes": [],
               "primaryKey": {
                 "columns": [
-                  "id_tel_cliente"
+                  "id"
                 ],
                 "name": "tel_cliente_pkey"
-              },
-              "uniques": []
-            },
-            "teste": {
-              "columns": {
-                "id_Teste": {
-                  "codecId": "pg/int4@1",
-                  "default": {
-                    "expression": "autoincrement()",
-                    "kind": "function"
-                  },
-                  "nativeType": "int4",
-                  "nullable": false
-                },
-                "nome_test": {
-                  "codecId": "sql/varchar@1",
-                  "nativeType": "character varying",
-                  "nullable": true
-                }
-              },
-              "foreignKeys": [],
-              "indexes": [],
-              "primaryKey": {
-                "columns": [
-                  "id_Teste"
-                ],
-                "name": "idTeste_pkey"
               },
               "uniques": []
             },
@@ -401,7 +471,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "e08cab79eb6f569f0d888cff84ee8fb54b1d80c9bec18f37ff63e1b70f58a42f"
+    "storageHash": "82359e0b63ffc441e01bb5e85cfbf41a0cbd9ee1e28ed35bd41ed98c71a147ca"
   },
   "capabilities": {
     "postgres": {

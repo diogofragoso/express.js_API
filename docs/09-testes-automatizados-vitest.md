@@ -25,7 +25,6 @@ Testes executáveis para HTTP, validação, autorização, cookies, hashes, erro
 **Propósito do passo:** Vitest executa os testes e informa quais passaram. Supertest envia pedidos diretamente à aplicação. A ferramenta de cobertura mostra quais trechos foram executados durante esses testes.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm install -D --save-exact vitest@4.1.11 @vitest/coverage-v8@4.1.11 supertest@7.3.0 @types/supertest@7.2.1
 ```
 
@@ -301,7 +300,6 @@ function validLogin() {
 **Propósito do passo:** Executar os testes confirma as regras descritas no código. Conferir tipos e compilar também é necessário, pois um teste aprovado não garante que todos os arquivos possam ser compilados.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm test
 npm run test:coverage
 npm run typecheck
@@ -339,7 +337,6 @@ Use a chave gerada pelo comando do capítulo 1. `DIRECT_URL`, se necessário, ta
 A aplicação precisa do contrato do capítulo 2 e das migrações versionadas. Aplique-as ao banco de testes explicitamente:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 node --env-file=.env.test ./node_modules/prisma/dist/prisma.js db migrate
 node --env-file=.env.test ./node_modules/prisma/dist/prisma.js db verify
 ```
@@ -434,7 +431,6 @@ it('cadastro → banco → login → autorização → atualização → exclus�
 Execute:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run test:integration
 ```
 

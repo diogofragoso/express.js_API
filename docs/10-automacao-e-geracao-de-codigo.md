@@ -30,7 +30,6 @@ flowchart LR
 **Propósito do passo:** Plop cria arquivos a partir de modelos de texto. Vamos usá-lo para repetir a organização que já construímos manualmente, sem copiar e renomear cada arquivo por conta própria.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm install -D --save-exact plop@4.0.5
 ```
 
@@ -81,7 +80,6 @@ model Cliente {
 ```
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run contract:emit
 npx prisma migration plan --name add_clientes
 ```
@@ -89,7 +87,6 @@ npx prisma migration plan --name add_clientes
 Revise o plano: deve acrescentar `Cliente`, mantendo `User`. Se ele propuser recriar `User`, confira a referência `db` e a aplicação da migração anterior antes de continuar.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npx prisma db migrate --advance-ref db
 npx prisma db verify
 ```
@@ -338,14 +335,12 @@ export default function (plop) {
 **Propósito do passo:** Vamos executar o gerador uma única vez e depois registrar a rota criada. Essa ordem evita importar um arquivo que ainda não existe.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run generate
 ```
 
 Escolha **recurso**, se houver seleção, e informe **cliente**. Alternativamente, passe a resposta pela linha de comando:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run generate -- recurso cliente
 ```
 
@@ -462,7 +457,6 @@ it('inclui CRUD de contatos no OpenAPI', async () => {
 **Propósito do passo:** Vamos confirmar que a geração não quebrou os recursos anteriores e testar os contatos no banco real. Os novos caminhos também precisam aparecer na página Swagger.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run typecheck
 npm test
 npm run build
@@ -473,7 +467,6 @@ Se o servidor estiver parado, execute `npm run dev` no primeiro CMD e deixe-o ab
 Para usar o CMD, defina `TOKEN` com esse novo token no segundo terminal, como no capítulo 5. A variável pertence somente ao terminal em que você a definiu. Agora teste o CRUD de clientes:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 set TOKEN=COLE_UM_TOKEN_VALIDO
 curl.exe -i -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d "{\"name\":\"Cliente Exemplo\",\"email\":\"cliente@example.com\"}" http://localhost:3000/clientes
 curl.exe -i -H "Authorization: Bearer %TOKEN%" http://localhost:3000/clientes
@@ -482,7 +475,6 @@ curl.exe -i -H "Authorization: Bearer %TOKEN%" http://localhost:3000/clientes
 Anote o ID criado; substitua `1` nos próximos exemplos:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i -H "Authorization: Bearer %TOKEN%" http://localhost:3000/clientes/1
 curl.exe -i -X PUT -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d "{\"name\":\"Cliente Atualizado\"}" http://localhost:3000/clientes/1
 curl.exe -i -X DELETE -H "Authorization: Bearer %TOKEN%" http://localhost:3000/clientes/1

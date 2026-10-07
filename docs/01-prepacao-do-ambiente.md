@@ -67,7 +67,6 @@ Você usará o nome `express_tutorial_dev`, o usuário e a senha dessa instalaç
 Agora crie a pasta do projeto no CMD. `mkdir` cria a pasta; `cd` entra nela; `npm init -y` cria `package.json` com os valores iniciais. `type=module` permite os imports usados no guia. `private=true` indica que este exercício não deve ser publicado como pacote npm.
 
 ```bat
-REM Execute no CMD, na pasta que vai conter a nova API.
 mkdir api
 cd api
 npm init -y
@@ -84,7 +83,6 @@ npm pkg set private=true --json
 **Propósito do passo:** Estes pacotes são partes que a API usa quando está funcionando, como receber pedidos HTTP, acessar o banco e conferir senhas. O npm registra suas versões em package.json e instala os arquivos em node_modules.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm install --save-exact express@5.2.1 @prisma/orm-postgres@8.0.0-rc.11 temporal-polyfill@1.0.5 dotenv@18.0.5 bcrypt@6.0.0 jsonwebtoken@9.0.3 zod@4.6.5 helmet@8.3.0 cors@2.8.6 express-rate-limit@8.7.0 cookie-parser@1.4.7 morgan@1.12.1 winston@3.19.0
 ```
 
@@ -105,7 +103,6 @@ Não instalamos `@prisma/client`: este tutorial usa a API do Prisma 8 em `@prism
 **Propósito do passo:** Estas ferramentas ajudam a escrever, executar e conferir o projeto durante o desenvolvimento. Elas também serão necessárias para compilar a aplicação e aplicar migrações; por isso, serão instaladas separadamente dos pacotes de execução.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm install -D --save-exact prisma@8.0.0-rc.15 @prisma/cli-engine@0.4.0 typescript@5.9.3 tsx@4.23.15 @types/node@26.6.4 @types/express@5.0.6 @types/bcrypt@6.0.0 @types/jsonwebtoken@9.0.10 @types/cors@2.8.19 @types/cookie-parser@1.4.10 @types/morgan@1.9.10
 npm ls --depth=0
 ```
@@ -119,7 +116,6 @@ npm ls --depth=0
 **Propósito do passo:** A inicialização cria a estrutura de arquivos que o Prisma espera. Usamos um caminho explícito para que todos trabalhem com o mesmo contrato e não acabem editando outro arquivo por engano.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npx prisma orm init --yes --target postgres --authoring psl --schema-path src/prisma/contract.prisma --write-env --skip-install
 ```
 
@@ -146,7 +142,6 @@ O caminho e a criação do `.env` estão explícitos. `--skip-install` evita uma
 A CLI pode modificar `tsconfig.json` e `package.json`. Por isso, reforce o modo ESM e substitua o `tsconfig.json` agora. Não execute `tsc --init` sobre o arquivo já criado.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm pkg set type=module
 ```
 
@@ -190,7 +185,6 @@ Substitua todo o conteúdo do arquivo existente. Configura a conversão de TypeS
 Gere uma chave local e copie a saída para `JWT_SECRET`:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
 ```
 
@@ -355,14 +349,12 @@ app.listen(env.PORT, () => {
 Inicie em um terminal e mantenha-o aberto:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run dev
 ```
 
 Em **outro CMD**, na mesma pasta:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i http://localhost:3000/health
 ```
 

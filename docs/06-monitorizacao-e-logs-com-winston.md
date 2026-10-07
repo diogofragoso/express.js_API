@@ -178,7 +178,6 @@ process.once('SIGTERM', shutdown);
 **Propósito do passo:** Vamos fazer um pedido válido e outro para uma rota ausente. Ambos precisam aparecer no arquivo de acessos, o que confirma que os registros não dependem apenas de erros internos.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run typecheck
 npm run dev
 ```
@@ -186,7 +185,6 @@ npm run dev
 Em outro terminal:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i http://localhost:3000/health
 curl.exe -i http://localhost:3000/rota-inexistente
 ```

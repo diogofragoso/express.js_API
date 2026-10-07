@@ -17,7 +17,6 @@ OpenAPI com cadastro, login, logout e todas as operações de usuários; Swagger
 **Propósito do passo:** Swagger oferece uma página para ler as operações e enviar pedidos. Instalamos a ferramenta que lê os comentários das rotas e a que exibe essa página.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm install --save-exact swagger-jsdoc@6.3.0 swagger-ui-express@5.0.1
 npm install -D --save-exact @types/swagger-jsdoc@6.0.4 @types/swagger-ui-express@4.1.8
 ```
@@ -322,7 +321,6 @@ app.use(errorHandler);
 **Propósito do passo:** Vamos testar a documentação no modo de desenvolvimento e na versão compilada. Também vamos enviar um pedido pela interface, para verificar que ela aponta para a API correta.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run typecheck
 npm run dev
 ```
@@ -330,7 +328,6 @@ npm run dev
 Abra [http://localhost:3000/api-docs](http://localhost:3000/api-docs). Em outro CMD:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i http://localhost:3000/api-docs.json
 ```
 
@@ -348,7 +345,6 @@ Os nomes dos botões acima são os exibidos pela ferramenta instalada; a traduç
 Pare o servidor de desenvolvimento com Ctrl+C:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run build
 npm start
 ```

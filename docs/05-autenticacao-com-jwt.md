@@ -344,7 +344,6 @@ app.use(errorHandler);
 **Propósito do passo:** Vamos comparar pedidos sem login, login incorreto e login correto. Depois verificaremos as duas formas de enviar a identificação: cabeçalho Bearer e cookie.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run typecheck
 ```
 
@@ -353,7 +352,6 @@ Com o servidor em execução, crie uma conta de teste se ainda não houver uma e
 Se o servidor estiver parado, execute `npm run dev` no primeiro CMD e deixe-o aberto. Execute os pedidos abaixo no segundo. Se já usou `login@example.com`, troque o e-mail em **todos** os pedidos de cadastro e login deste teste ou reutilize a conta existente sem repetir o cadastro.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i http://localhost:3000/users
 curl.exe -i -H "Content-Type: application/json" -d "{\"email\":\"login@example.com\",\"password\":\"Teste123!\",\"name\":\"Pessoa Teste\"}" http://localhost:3000/users
 curl.exe -i -H "Content-Type: application/json" -d "{\"email\":\"login@example.com\",\"password\":\"SenhaErrada\"}" http://localhost:3000/login
@@ -368,7 +366,6 @@ Copie o token para o CMD:
 Na resposta do login, procure o campo `token`. Copie somente o texto entre as aspas, sem as aspas e sem a palavra `Bearer`. No comando `set` abaixo, substitua `COLE_O_TOKEN_DO_LOGIN` pelo texto copiado. `%TOKEN%` lê essa variável **nesse mesmo CMD**; ao abrir outro terminal, você precisa defini-la novamente.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 set TOKEN=COLE_O_TOKEN_DO_LOGIN
 curl.exe -i -H "Authorization: Bearer %TOKEN%" http://localhost:3000/users
 ```
@@ -378,7 +375,6 @@ Consulte o próprio ID: 200. Consulte um ID de outra conta com o mesmo token: 40
 Teste cookie em uma atualização, substituindo o ID:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i -X PUT -b cookies.txt -H "Origin: http://localhost:5173" -H "Content-Type: application/json" -d "{\"name\":\"Nome Atualizado\"}" http://localhost:3000/users/1
 curl.exe -i -X POST -b cookies.txt -c cookies.txt http://localhost:3000/logout
 ```

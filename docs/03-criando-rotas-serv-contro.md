@@ -296,7 +296,6 @@ process.once('SIGTERM', shutdown);
 **Propósito do passo:** Vamos testar criar, consultar, atualizar e excluir um registro. Essa sequência é chamada CRUD e confirma que a requisição percorre rota, controlador, serviço e banco.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run typecheck
 npm run dev
 ```
@@ -304,7 +303,6 @@ npm run dev
 Em outro CMD, cadastre um usuário:
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i -H "Content-Type: application/json" -d "{\"email\":\"teste@example.com\",\"password\":\"Teste123!\",\"name\":\"Pessoa Teste\"}" http://localhost:3000/users
 curl.exe -i http://localhost:3000/users
 ```
@@ -314,7 +312,6 @@ Anote o `id` devolvido. Os exemplos seguintes usam `1`; substitua pelo ID real.
 Nos comandos, `-H` define um cabeçalho e `-d` envia o corpo JSON, fazendo um pedido `POST` neste caso. `Content-Type: application/json` informa à API o formato do corpo. `-X PUT` e `-X DELETE` escolhem os métodos de atualização e exclusão. Os caracteres `\"` dentro do JSON são necessários para representar aspas nos comandos do CMD; copie-os como aparecem.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i http://localhost:3000/users/1
 curl.exe -i -X PUT -H "Content-Type: application/json" -d "{\"name\":\"Nome Alterado\"}" http://localhost:3000/users/1
 curl.exe -i -X DELETE http://localhost:3000/users/1

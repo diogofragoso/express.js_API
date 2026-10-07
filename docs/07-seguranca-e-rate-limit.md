@@ -132,7 +132,6 @@ app.use(errorHandler);
 **Propósito do passo:** Vamos observar os cabeçalhos de proteção, a permissão para o navegador e o bloqueio de uma origem desconhecida. Depois repetiremos um login inválido para conferir o limite.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run typecheck
 ```
 
@@ -141,7 +140,6 @@ Com o servidor aberto, execute no CMD:
 Se ele estiver parado, execute `npm run dev` no primeiro terminal. Nos pedidos abaixo, `Origin` simula o endereço da página, e os cabeçalhos `Access-Control-Request-*` simulam a pergunta de permissão feita pelo navegador.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i http://localhost:3000/health
 curl.exe -i -X OPTIONS -H "Origin: http://localhost:5173" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: Content-Type" http://localhost:3000/login
 curl.exe -i -H "Origin: https://origem-desconhecida.example" -H "Content-Type: application/json" -d "{}" http://localhost:3000/login
@@ -154,7 +152,6 @@ Para testar o limite de login, use um e-mail inexistente, em um servidor recém-
 No primeiro terminal, pare `npm run dev` com Ctrl+C e inicie-o novamente com o mesmo comando. Não altere os limites para fazer o teste passar. No segundo CMD, execute o laço abaixo: ele envia o mesmo login incorreto seis vezes, uma após a outra.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 for /L %i in (1,1,6) do @curl.exe -i -H "Content-Type: application/json" -d "{\"email\":\"inexistente@example.com\",\"password\":\"SenhaErrada\"}" http://localhost:3000/login
 ```
 

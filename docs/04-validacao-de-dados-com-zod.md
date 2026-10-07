@@ -135,7 +135,6 @@ O controlador completo do capítulo 3 pode ser mantido. Sua verificação básic
 **Propósito do passo:** Vamos enviar dados incorretos de propósito e depois um e-mail que precisa de normalização. A comparação das respostas mostra se a validação rejeita erros e se o valor corrigido chega ao banco.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 npm run typecheck
 ```
 
@@ -144,7 +143,6 @@ Com a API aberta, em outro CMD:
 Se parou o servidor para editar os arquivos, execute `npm run dev` no primeiro terminal e espere a mensagem de inicialização. Os comandos abaixo vão no segundo terminal, na raiz da mesma API.
 
 ```bat
-REM Execute no CMD, na raiz da sua API (pasta que contém package.json).
 curl.exe -i -H "Content-Type: application/json" -d "{\"email\":\"email-invalido\",\"password\":\"123\"}" http://localhost:3000/users
 curl.exe -i -H "Content-Type: application/json" -d "{\"email\":\"valido@example.com\",\"password\":\"Teste123!\",\"id\":99}" http://localhost:3000/users
 curl.exe -i -H "Content-Type: application/json" -d "{\"email\":\" NORMALIZADO@EXAMPLE.COM \",\"password\":\"Teste123!\"}" http://localhost:3000/users

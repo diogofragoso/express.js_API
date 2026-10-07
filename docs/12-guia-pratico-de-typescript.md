@@ -587,7 +587,6 @@ Use esta tabela como consulta rápida enquanto desenvolve:
 Sempre que estiver escrevendo código TypeScript nesta API, abra o terminal no diretório da API e execute:
 
 ```bat
-REM No Windows (CMD ou PowerShell com npm.cmd):
 npm.cmd run typecheck
 ```
 
