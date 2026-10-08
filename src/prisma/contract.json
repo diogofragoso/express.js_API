@@ -12,8 +12,16 @@
       "model": "Estudante",
       "namespace": "public"
     },
+    "funcionario": {
+      "model": "Funcionario",
+      "namespace": "public"
+    },
     "tel_cliente": {
       "model": "TelCliente",
+      "namespace": "public"
+    },
+    "tel_funcionario": {
+      "model": "TelFuncionario",
       "namespace": "public"
     },
     "user": {
@@ -143,6 +151,57 @@
               "table": "estudante"
             }
           },
+          "Funcionario": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "email": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "email": {
+                  "column": "email"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "name": {
+                  "column": "name"
+                }
+              },
+              "namespaceId": "public",
+              "table": "funcionario"
+            }
+          },
           "TelCliente": {
             "fields": {
               "id": {
@@ -199,6 +258,64 @@
               },
               "namespaceId": "public",
               "table": "tel_cliente"
+            }
+          },
+          "TelFuncionario": {
+            "fields": {
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "idTelFuncionario": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "telFuncionario": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "funcionario": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "idTelFuncionario"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Funcionario",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "id": {
+                  "column": "id"
+                },
+                "idTelFuncionario": {
+                  "column": "id_tel_funcionario_fk"
+                },
+                "telFuncionario": {
+                  "column": "tel_funcionario"
+                }
+              },
+              "namespaceId": "public",
+              "table": "tel_funcionario"
             }
           },
           "User": {
@@ -360,6 +477,47 @@
               },
               "uniques": []
             },
+            "funcionario": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "email": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ],
+                "name": "funcionario_pkey"
+              },
+              "uniques": []
+            },
             "tel_cliente": {
               "columns": {
                 "id": {
@@ -409,6 +567,58 @@
                   "id"
                 ],
                 "name": "tel_cliente_pkey"
+              },
+              "uniques": []
+            },
+            "tel_funcionario": {
+              "columns": {
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "id_tel_funcionario_fk": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "tel_funcionario": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "name": "tel_funcionario_fk",
+                  "onDelete": "restrict",
+                  "onUpdate": "restrict",
+                  "source": {
+                    "columns": [
+                      "id_tel_funcionario_fk"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "tel_funcionario"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "funcionario"
+                  }
+                }
+              ],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ],
+                "name": "tel_funcionario_pkey"
               },
               "uniques": []
             },
@@ -471,7 +681,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "82359e0b63ffc441e01bb5e85cfbf41a0cbd9ee1e28ed35bd41ed98c71a147ca"
+    "storageHash": "35e7608bda796299f01121a75527577b633186fcbc0188192f6515fdf69272cf"
   },
   "capabilities": {
     "postgres": {

@@ -29,6 +29,16 @@ model TelCliente {
   @@map("tel_cliente")
 }
 
+model TelFuncionario{
+  id                       Int            @id(map: "tel_funcionario_pkey") @default(autoincrement())
+  idTelFuncionario         Int            @map("id_tel_funcionario_fk")
+  telFuncionario           String         @map("tel_funcionario")
+  funcionario              Funcionario    @relation(fields: [idTelFuncionario], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tel_funcionario_fk", index: false)
+  @@map("tel_funcionario")
+
+}
+
+
 model User {
   id        Int         @id(map: "user_pkey") @default(autoincrement())
   createdAt Timestamptz @default(now())
@@ -38,3 +48,13 @@ model User {
 
   @@map("user")
 }
+
+model Funcionario{
+  id        Int       @id(map: "funcionario_pkey") @default(autoincrement())
+  createdAt Timestamptz @default(now())
+  name String
+  email String  
+  @@map("funcionario")
+}
+
+

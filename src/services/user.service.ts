@@ -11,6 +11,8 @@ export interface CreateUserInput {
 export type UpdateUserInput = Partial<CreateUserInput>;
 type UserRow = Awaited<ReturnType<typeof db.orm.public.User.create>>;
 
+
+
 export const toPublicUser = (user: UserRow) => ({
   id: user.id,
   email: user.email,

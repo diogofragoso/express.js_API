@@ -9,7 +9,7 @@ const origin = z.url().refine(value => {
 
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  PORT: z.union([z.coerce.number().int().min(1).max(65535), z.string()]).default(3000),
   FRONTEND_ORIGIN: origin.default('http://localhost:5173'),
   API_ORIGIN: origin.default('http://localhost:3000'),
   DATABASE_URL: z.string().regex(/^postgres(ql)?:\/\//, 'Use uma URL PostgreSQL.').pipe(z.url()),
