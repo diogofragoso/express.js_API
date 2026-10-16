@@ -2,7 +2,7 @@
 
 # 09 · Testes automatizados com Vitest e Supertest
 
-[← Anterior](08-documentacao-com-swagger.md) · [Índice](../README.md) · **Etapa 9 de 11** · [Próxima →](10-automacao-e-geracao-de-codigo.md)
+[← Anterior](08-documentacao-com-swagger.md) · [Índice](../README.md) · **Etapa 9 de 13** · [Próxima →](10-automacao-e-geracao-de-codigo.md)
 
 **Ponto de partida:** conclua o capítulo anterior antes de continuar. Todos os caminhos abaixo partem da raiz da sua API, a pasta que contém `package.json`. Crie as subpastas indicadas no editor quando ainda não existirem.
 

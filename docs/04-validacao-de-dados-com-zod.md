@@ -2,7 +2,7 @@
 
 # 04 · Validação e normalização com Zod
 
-[← Anterior](03-criando-rotas-serv-contro.md) · [Índice](../README.md) · **Etapa 4 de 11** · [Próxima →](05-autenticacao-com-jwt.md)
+[← Anterior](03-criando-rotas-serv-contro.md) · [Índice](../README.md) · **Etapa 4 de 13** · [Próxima →](05-autenticacao-com-jwt.md)
 
 **Ponto de partida:** conclua o capítulo anterior antes de continuar. Todos os caminhos abaixo partem da raiz da sua API, a pasta que contém `package.json`. Crie as subpastas indicadas no editor quando ainda não existirem.
 

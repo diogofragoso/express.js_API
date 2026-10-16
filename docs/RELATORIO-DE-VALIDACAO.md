@@ -137,3 +137,30 @@ Permanecem fora do escopo executado:
 - Adaptação do gerador aos campos e às relações do banco original de `api`.
 
 Para repetir, use uma pasta e bancos novos, siga os capítulos e registre os resultados do [capítulo 11](11-validacao-ponta-a-ponta.md). Não considere aprovado um passo que não tenha sido executado.
+
+## Validação do capítulo 13 · RBAC — 16 de outubro de 2026
+
+**Resultado: aprovado.** O [capítulo de RBAC](13-controle-de-acesso-com-rbac.md) foi aplicado em uma pasta temporária fora do repositório, sobre a API reconstruída dos blocos finais dos capítulos 1 a 11. Esta execução valida a extensão de RBAC; não substitui nem redata a execução sequencial de 2 de outubro descrita acima.
+
+| Verificação | Resultado |
+|---|---|
+| Migração opcional, catálogo e vínculo obrigatório | Aplicados e verificados em dois bancos exclusivos |
+| Contas anteriores ao RBAC | Dados preservados; perfil ALUNO atribuído nos dois bancos |
+| Inicializador executado novamente | Sem duplicar tipos nem alterar perfis já definidos |
+| Arquivos completos do novo capítulo | 7 comparados com os executados, considerando a alteração final do vínculo |
+| Método da migração obrigatória | Comparado com o trecho documentado; plano reemitido sem placeholders |
+| Tipos da aplicação e dos testes | Aprovados |
+| Testes anteriores sem banco | 23 aprovados |
+| Integração PostgreSQL | 2 aprovados, incluindo o novo cenário RBAC |
+| Build | Aprovado |
+| API compilada por HTTP real | 21 verificações aprovadas |
+| Reaplicação das migrações em banco vazio | Aprovada em um terceiro banco, com catálogo inicializado antes do cadastro |
+| Limpeza | Nenhuma conta remanescente; três bancos exclusivos removidos; arquivos temporários de ambiente removidos |
+
+As verificações incluem 401 sem autenticação, 403 para aluno, 200 administrativo sem hash, cookie, rejeição de campos de privilégio, proteção das rotas pessoais inclusive para ADMIN, papel desconhecido no banco, remoção de privilégio com o mesmo JWT e impedimento de excluir um tipo em uso. Os scripts de atribuição foram exercitados em TypeScript e na versão compilada.
+
+A execução identificou que o Prisma 8 RC gera uma transformação pendente ao tornar a coluna obrigatória. O capítulo foi corrigido para ensinar a preservar os imports dos snapshots, substituir somente o método `operations` após preencher as contas e executar `migration.ts` para emitir o plano antes de aplicá-lo. A migração corrigida passou nos dois bancos e também na reaplicação em banco vazio.
+
+**Ambiente:** Windows, Node.js 24.11.1, TypeScript 5.9.3, Prisma CLI 8.0.0-rc.15, ORM PostgreSQL 8.0.0-rc.11 e Vitest 4.1.11. A versão do PostgreSQL e os hashes dos exemplos constam nas [evidências de RBAC](evidencias/2026-10-16-rbac.json). O runtime disponível era anterior ao Node 24.15.0 recomendado no README; a validação registra a versão efetivamente usada.
+
+O projeto de validação e seus executores permaneceram na pasta temporária `express-rbac-validation-lO5qbH`, fora do Git. Não foram alterados código, dependências, migrações nem dados da aplicação original. Os segredos temporários foram removidos. Swagger foi conferido por HTML e OpenAPI via HTTP; não houve inspeção visual em navegador, publicação HTTPS ou avaliação de produção.

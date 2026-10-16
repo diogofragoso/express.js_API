@@ -2,7 +2,7 @@
 
 # 11 · Validação final e operação
 
-[← Anterior](10-automacao-e-geracao-de-codigo.md) · [Índice](../README.md) · **Etapa 11 de 12** · [Próxima →](12-guia-pratico-de-typescript.md)
+[← Anterior](10-automacao-e-geracao-de-codigo.md) · [Índice](../README.md) · **Etapa 11 de 13** · [Próxima →](12-guia-pratico-de-typescript.md)
 
 ## Objetivo
 

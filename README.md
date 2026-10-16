@@ -77,6 +77,7 @@ Cada capítulo apresenta os termos específicos quando eles passam a ser necess�
 | 10 | [Gerador de recursos com Plop](docs/10-automacao-e-geracao-de-codigo.md) | CRUD `Cliente`, quatro arquivos gerados e seis testes adicionais |
 | 11 | [Validação final e operação](docs/11-validacao-ponta-a-ponta.md) | 23 testes, banco, CRUD, cookies e execução compilada conferidos |
 | 12 | [TypeScript no projeto](docs/12-guia-pratico-de-typescript.md) | Guia para estudantes: sintaxe, exemplos práticos e conexões com o código da API |
+| 13 | [Controle de acesso com RBAC](docs/13-controle-de-acesso-com-rbac.md) | Usuários e tipos, permissões por papel, migração segura e testes de autorização |
 
 A ordem importa: emitir contrato não aplica tabelas, gerar código não cria modelos e compilar não confirma conexão com o banco.
 
@@ -152,13 +153,13 @@ api/
 | Recurso | Regra |
 |---|---|
 | Cadastro e login | Públicos, validados e limitados |
-| Conta `User` | Somente o próprio titular; sem hash nas respostas |
+| Conta `User` | Rotas pessoais: somente o titular; capítulo 13 acrescenta consulta administrativa com RBAC; sem hash nas respostas |
 | Contatos `Cliente` | Compartilhados entre usuários autenticados neste exercício |
 | Cookie em escrita | Origem confiável obrigatória nas rotas autenticadas |
 | JWT | HS256, emissor/audiência definidos e duração de 15 minutos |
 | Logout | Limpa cookie; cliente descarta Bearer; não revoga JWT já emitido |
 
-O tutorial não implementa administrador, recuperação de senha, revogação imediata, refresh token ou permissões individuais sobre contatos. Esses recursos precisam de regras próprias antes de expandir o produto.
+Até o capítulo 11, cada conta acessa somente seus próprios dados. O [capítulo 13](docs/13-controle-de-acesso-com-rbac.md) acrescenta os papéis ALUNO e ADMIN e uma permissão de consulta administrativa. Recuperação de senha, revogação geral de JWT, refresh token e permissões individuais sobre contatos exigem implementação própria.
 
 ## ▶️ Comandos da API depois de construída
 
@@ -184,6 +185,8 @@ Após o capítulo 8, a interface fica em [http://localhost:3000/api-docs](http:/
 **Os onze capítulos foram executados em sequência em uma pasta nova (`api5`), com PostgreSQL real e bancos separados para desenvolvimento e integração, em 2 de outubro de 2026.** Passaram os 23 testes sem banco, o teste de integração, os CRUDs reais, o build, a execução sem dependências de desenvolvimento e a interação com Swagger e cookies no Edge. Naquela execução, os 40 arquivos finais identificados no Markdown foram comparados com os arquivos executados.
 
 A revisão didática seguinte acrescentou identificação dos arquivos, avisos em português e explicações de cada passo. A lógica dos 40 arquivos foi comparada com a versão aprovada, e os exemplos com os novos cabeçalhos foram emitidos, gerados, compilados e testados novamente em uma cópia isolada. Veja as [evidências da revisão didática](docs/evidencias/2026-10-02-revisao-didatica.json).
+
+**O capítulo 13 foi validado em 16 de outubro de 2026**, em projeto temporário e bancos exclusivos: 23 testes sem banco, dois de integração, build e 21 verificações HTTP da versão compilada aprovados. Veja as [evidências de RBAC](docs/evidencias/2026-10-16-rbac.json) e o registro abaixo para ambiente, correção da migração e limites.
 
 Consulte o [registro da validação e suas evidências](docs/RELATORIO-DE-VALIDACAO.md). A aprovação se refere às versões e ao ambiente registrados; repita o [capítulo 11](docs/11-validacao-ponta-a-ponta.md) na sua própria instalação. Renderização no GitHub e publicação HTTPS não fizeram parte da execução local.
 

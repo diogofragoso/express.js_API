@@ -2,7 +2,7 @@
 
 # 06 · Logs com Winston e Morgan
 
-[← Anterior](05-autenticacao-com-jwt.md) · [Índice](../README.md) · **Etapa 6 de 11** · [Próxima →](07-seguranca-e-rate-limit.md)
+[← Anterior](05-autenticacao-com-jwt.md) · [Índice](../README.md) · **Etapa 6 de 13** · [Próxima →](07-seguranca-e-rate-limit.md)
 
 **Ponto de partida:** conclua o capítulo anterior antes de continuar. Todos os caminhos abaixo partem da raiz da sua API, a pasta que contém `package.json`. Crie as subpastas indicadas no editor quando ainda não existirem.
 

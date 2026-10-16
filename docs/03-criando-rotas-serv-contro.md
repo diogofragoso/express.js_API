@@ -2,7 +2,7 @@
 
 # 03 · Rotas, controladores e serviços
 
-[← Anterior](02-modelagem-e-sincronizacao-com-prisma.md) · [Índice](../README.md) · **Etapa 3 de 11** · [Próxima →](04-validacao-de-dados-com-zod.md)
+[← Anterior](02-modelagem-e-sincronizacao-com-prisma.md) · [Índice](../README.md) · **Etapa 3 de 13** · [Próxima →](04-validacao-de-dados-com-zod.md)
 
 **Ponto de partida:** conclua o capítulo anterior antes de continuar. Todos os caminhos abaixo partem da raiz da sua API, a pasta que contém `package.json`. Crie as subpastas indicadas no editor quando ainda não existirem.
 

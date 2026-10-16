@@ -2,7 +2,7 @@
 
 # 02 · Contrato, banco e migrações
 
-[← Anterior](01-prepacao-do-ambiente.md) · [Índice](../README.md) · **Etapa 2 de 11** · [Próxima →](03-criando-rotas-serv-contro.md)
+[← Anterior](01-prepacao-do-ambiente.md) · [Índice](../README.md) · **Etapa 2 de 13** · [Próxima →](03-criando-rotas-serv-contro.md)
 
 **Ponto de partida:** conclua o capítulo anterior antes de continuar. Todos os caminhos abaixo partem da raiz da sua API, a pasta que contém `package.json`. Crie as subpastas indicadas no editor quando ainda não existirem.
 

@@ -2,7 +2,7 @@
 
 # 08 · Documentação interativa com Swagger
 
-[← Anterior](07-seguranca-e-rate-limit.md) · [Índice](../README.md) · **Etapa 8 de 11** · [Próxima →](09-testes-automatizados-vitest.md)
+[← Anterior](07-seguranca-e-rate-limit.md) · [Índice](../README.md) · **Etapa 8 de 13** · [Próxima →](09-testes-automatizados-vitest.md)
 
 **Ponto de partida:** conclua o capítulo anterior antes de continuar. Todos os caminhos abaixo partem da raiz da sua API, a pasta que contém `package.json`. Crie as subpastas indicadas no editor quando ainda não existirem.
 

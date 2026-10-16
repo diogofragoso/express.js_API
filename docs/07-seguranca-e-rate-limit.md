@@ -2,7 +2,7 @@
 
 # 07 · Cabeçalhos, origens e limite de requisições
 
-[← Anterior](06-monitorizacao-e-logs-com-winston.md) · [Índice](../README.md) · **Etapa 7 de 11** · [Próxima →](08-documentacao-com-swagger.md)
+[← Anterior](06-monitorizacao-e-logs-com-winston.md) · [Índice](../README.md) · **Etapa 7 de 13** · [Próxima →](08-documentacao-com-swagger.md)
 
 **Ponto de partida:** conclua o capítulo anterior antes de continuar. Todos os caminhos abaixo partem da raiz da sua API, a pasta que contém `package.json`. Crie as subpastas indicadas no editor quando ainda não existirem.
 

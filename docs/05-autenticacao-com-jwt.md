@@ -2,7 +2,7 @@
 
 # 05 · Autenticação, autorização e cookies
 
-[← Anterior](04-validacao-de-dados-com-zod.md) · [Índice](../README.md) · **Etapa 5 de 11** · [Próxima →](06-monitorizacao-e-logs-com-winston.md)
+[← Anterior](04-validacao-de-dados-com-zod.md) · [Índice](../README.md) · **Etapa 5 de 13** · [Próxima →](06-monitorizacao-e-logs-com-winston.md)
 
 **Ponto de partida:** conclua o capítulo anterior antes de continuar. Todos os caminhos abaixo partem da raiz da sua API, a pasta que contém `package.json`. Crie as subpastas indicadas no editor quando ainda não existirem.
 
@@ -18,7 +18,7 @@ Login com JWT de 15 minutos; acesso por Bearer ou cookie HttpOnly; cada usuário
 | `GET /users` | Autenticado; devolve uma lista com **a própria conta**, não todas as contas |
 | `GET`, `PUT`, `DELETE /users/:id` | Autenticado; `id` deve ser o do token |
 
-Não há papel de administrador neste tutorial. Autenticar alguém não concede permissão para alterar contas alheias.
+Até esta etapa não há papel de administrador. Autenticar alguém não concede permissão para alterar contas alheias. O [capítulo 13](13-controle-de-acesso-com-rbac.md) acrescenta RBAC com uma permissão administrativa de consulta.
 
 | Termo | Para que serve |
 |---|---|

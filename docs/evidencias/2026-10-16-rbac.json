@@ -1,0 +1,169 @@
+{
+  "date": "2026-10-16",
+  "timezone": "America/Sao_Paulo",
+  "result": "aprovado",
+  "scope": "Capítulo 13 aplicado à API reconstruída dos blocos dos capítulos 1 a 11; não é uma nova execução sequencial completa desses capítulos.",
+  "environment": {
+    "os": "Windows",
+    "node": "v24.11.1",
+    "postgres": "18.6 (653b019)",
+    "prisma": "8.0.0-rc.15",
+    "ormPostgres": "8.0.0-rc.11",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  },
+  "isolation": {
+    "projectOutsideRepository": true,
+    "exclusiveDatabases": 3,
+    "originalApplicationAndDataUnchanged": true,
+    "remainingTestUsers": 0,
+    "databasesDropped": true,
+    "temporaryEnvironmentFilesRemoved": true
+  },
+  "validation": {
+    "typescriptApplication": true,
+    "typescriptTests": true,
+    "unitTestsPassed": 23,
+    "integrationTestsPassed": 2,
+    "build": true,
+    "compiledHttpChecks": [
+      {
+        "label": "OpenAPI administrativo",
+        "result": "Papel sem a permissão users:read:any."
+      },
+      {
+        "label": "Swagger HTML",
+        "result": 200
+      },
+      {
+        "label": "Cadastro ana-rbac@example.com",
+        "result": 201
+      },
+      {
+        "label": "Cadastro bruno-rbac@example.com",
+        "result": 201
+      },
+      {
+        "label": "Cadastro sem senha pública",
+        "result": false
+      },
+      {
+        "label": "Promoção pública",
+        "result": 400
+      },
+      {
+        "label": "Login ana-rbac@example.com",
+        "result": 200
+      },
+      {
+        "label": "Login bruno-rbac@example.com",
+        "result": 200
+      },
+      {
+        "label": "Sem login",
+        "result": 401
+      },
+      {
+        "label": "Aluno bloqueado",
+        "result": 403
+      },
+      {
+        "label": "Promovido com o mesmo JWT",
+        "result": 200
+      },
+      {
+        "label": "Conta consultada",
+        "result": 4
+      },
+      {
+        "label": "Hash ausente",
+        "result": false
+      },
+      {
+        "label": "Cookie administrativo",
+        "result": 200
+      },
+      {
+        "label": "Outra conta na rota pessoal",
+        "result": 403
+      },
+      {
+        "label": "Autoatribuição na edição",
+        "result": 400
+      },
+      {
+        "label": "Papel desconhecido no banco",
+        "result": 403
+      },
+      {
+        "label": "Removido com o mesmo JWT",
+        "result": 403
+      },
+      {
+        "label": "FK impede excluir tipo em uso",
+        "result": true
+      },
+      {
+        "label": "Exclusão própria 0",
+        "result": 204
+      },
+      {
+        "label": "Exclusão própria 1",
+        "result": 204
+      }
+    ],
+    "emptyDatabaseReplay": {
+      "replayPassed": true,
+      "defaultAluno": true,
+      "postgresVersion": "18.6 (653b019)",
+      "remainingUsers": 0
+    },
+    "legacyUsersPreserved": true,
+    "initializerIdempotent": true,
+    "migrationOperationsMatchDocumentation": true,
+    "fullFilesCompared": [
+      {
+        "file": "src/prisma/contract.prisma",
+        "sha256": "2dec234c4d96e3092b0a727b04a5087e9e9a5679114de47f55f0a8dcb98eb024",
+        "matchesDocumentation": true
+      },
+      {
+        "file": "src/scripts/init-rbac.ts",
+        "sha256": "83d34e006779120ee05ee6543f4e80e477c365cf6f01ad78a6e9bb5e91f93c00",
+        "matchesDocumentation": true
+      },
+      {
+        "file": "src/security/permissions.ts",
+        "sha256": "b78d1daf57dbabee5d563b163fd397bedde3893bb3814e831a3014db76a35de5",
+        "matchesDocumentation": true
+      },
+      {
+        "file": "src/middlewares/permission.middleware.ts",
+        "sha256": "8335418b152b837a3769618dff721e6d50ada04b995501277464b79199f1d471",
+        "matchesDocumentation": true
+      },
+      {
+        "file": "src/routes/admin.route.ts",
+        "sha256": "0034841d3c112db397a1494998164a5a1656c7df02a8318b7dcccf6c41301917",
+        "matchesDocumentation": true
+      },
+      {
+        "file": "src/scripts/set-user-role.ts",
+        "sha256": "1acd0b9a831cdc169a572074a2b5c13457d90cf3176c068edabb3767ec0e0f36",
+        "matchesDocumentation": true
+      },
+      {
+        "file": "tests/rbac.integration.test.ts",
+        "sha256": "abaeb959535948fd99ee53108004103c2fe338c116f31cd864c5aa6efe45e23d",
+        "matchesDocumentation": true
+      }
+    ]
+  },
+  "correction": "Prisma 8 RC gera placeholders ao tornar a coluna obrigatória. O guia agora ensina a preservar os snapshots, substituir somente operations e executar migration.ts para emitir o plano antes de aplicar.",
+  "limits": [
+    "Sem teste visual em navegador; verificados HTML Swagger e OpenAPI por HTTP.",
+    "Sem publicação HTTPS ou avaliação de produção.",
+    "Runtime disponível: Node 24.11.1; o README recomenda 24.15.0 ou posterior."
+  ],
+  "localEvidenceDirectory": "express-rbac-validation-lO5qbH"
+}

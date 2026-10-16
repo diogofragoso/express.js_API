@@ -2,7 +2,7 @@
 
 # 01 · Preparação do ambiente
 
-[← Índice](../README.md) · **Etapa 1 de 11** · [Próxima →](02-modelagem-e-sincronizacao-com-prisma.md)
+[← Índice](../README.md) · **Etapa 1 de 13** · [Próxima →](02-modelagem-e-sincronizacao-com-prisma.md)
 
 > **📌 Importante**
 >

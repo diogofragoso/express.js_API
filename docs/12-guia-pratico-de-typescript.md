@@ -2,7 +2,7 @@
 
 # 12 · Guia de TypeScript para Estudantes: Sintaxe, Exemplos e Aplicação no Projeto
 
-[← Anterior](11-validacao-ponta-a-ponta.md) · [Índice](../README.md) · **Etapa 12 de 12** · [Registro de Validação](RELATORIO-DE-VALIDACAO.md)
+[← Anterior](11-validacao-ponta-a-ponta.md) · [Índice](../README.md) · **Etapa 12 de 13** · [Próxima →](13-controle-de-acesso-com-rbac.md)
 
 Bem-vindo ao **Guia Prático de TypeScript**! Se você já programa em JavaScript ou está aprendendo backend, este capítulo foi feito sob medida para você. 
 
@@ -595,4 +595,4 @@ npm.cmd run typecheck
 
 ---
 
-[← Voltar ao Capítulo 11 (Validação e Operação)](11-validacao-ponta-a-ponta.md) · [Índice Geral do Projeto](../README.md)
+[← Validação](11-validacao-ponta-a-ponta.md) · [Índice](../README.md) · [13 · RBAC →](13-controle-de-acesso-com-rbac.md)
