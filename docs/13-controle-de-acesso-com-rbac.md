@@ -2,19 +2,20 @@
 
 # 13 · Controle de acesso por tipo de usuário com RBAC
 
-[← Anterior](12-guia-pratico-de-typescript.md) · [Índice](../README.md) · **Etapa 13 de 13** · [Registro de validação](RELATORIO-DE-VALIDACAO.md)
+[← Anterior](12-guia-pratico-de-typescript.md) · [Índice](../README.md) · **Etapa 13 de 14** · [Próxima →](14-front-end-react-rbac.md)
 
 **Ponto de partida:** use a API reconstruída pelos capítulos 1 a 11, com as versões fixadas no README. O capítulo 12 ajuda a entender os tipos usados aqui. O código existente em `src/` deste repositório pode ter modelos adicionais. Todos os caminhos abaixo partem da raiz da API, onde fica `package.json`. Crie as subpastas indicadas quando necessário. Os blocos `bat` são comandos para **CMD**, uma linha por vez; no PowerShell use `npm.cmd` e `npx.cmd`.
 
 ## Resultado desta etapa
 
-Teremos uma tabela de usuários (modelo `User`) e outra de tipos de usuário (`tipo_usuario`). Cada conta terá um tipo: `ALUNO` ou `ADMIN`. O administrador poderá **consultar** outras contas em uma rota administrativa. As rotas pessoais continuarão permitindo alterações e exclusões somente na própria conta.
+Teremos uma tabela de usuários (modelo `User`) e outra de tipos de usuário (`tipo_usuario`). Cada conta terá um tipo: `ALUNO` ou `ADMIN`. O administrador poderá **listar todos os usuários** e **consultar qualquer conta** em rotas administrativas. As respostas públicas de usuário (`/login`, `/users`, `/admin/users`) passarão a informar o tipo e papel (`userTypeId` e `role: 'ALUNO' | 'ADMIN'`), permitindo que aplicações front-end (como no [capítulo 14](14-front-end-react-rbac.md)) controlem telas, navegação e botões conforme o perfil autenticado. As rotas pessoais continuarão permitindo alterações e exclusões somente na própria conta.
 
 | Pedido | Sem login | ALUNO | ADMIN |
 |---|---|---|---|
-| `POST /users`, `POST /login` | Permitido | Permitido | Permitido |
-| `GET /users` | 401 | Só a própria conta | Só a própria conta |
+| `POST /users`, `POST /login` | Permitido (retorna `user.role`) | Permitido | Permitido |
+| `GET /users` | 401 | Só a própria conta (com `role`) | Só a própria conta (com `role`) |
 | `GET`, `PUT`, `DELETE /users/:id` | 401 | Só a própria conta | Só a própria conta |
+| `GET /admin/users` | 401 | 403 | Lista todas as contas cadastradas |
 | `GET /admin/users/:id` | 401 | 403 | Consulta a conta indicada |
 | Escolher perfil no cadastro HTTP | Campo extra: 400 | Campo extra: 400 | Campo extra: 400 |
 
@@ -308,9 +309,41 @@ O JWT continua contendo somente o ID. Consultar o papel atual permite remover pr
 
 Para facilitar a leitura, a autenticação e este middleware consultam a conta separadamente. Futuramente, você pode compartilhar o registro carregado no mesmo pedido, mantendo a leitura do papel atual. No Express 5, erros das consultas deste middleware assíncrono seguem para o tratamento central de erros; uma falha no banco não concede acesso.
 
-## 6. Criar e conectar a rota administrativa
+## 6. Atualizar serviço, controlador e rotas administrativas
 
-**Propósito do passo:** oferecer uma operação com permissão explícita sem enfraquecer as rotas pessoais.
+**Propósito do passo:** expor o perfil do usuário nas respostas públicas para o front-end React e oferecer rotas administrativas (listagem geral e consulta individual) com permissão explícita sem enfraquecer as rotas pessoais.
+
+Primeiro, atualizamos a função `toPublicUser` em `src/services/user.service.ts` para que o objeto público inclua `userTypeId` e o código do perfil (`role: 'ALUNO' | 'ADMIN'`), mantendo a senha protegida.
+
+**Arquivo: `src/services/user.service.ts` — somente a função `toPublicUser`**
+
+Substitua a função `toPublicUser` existente em `src/services/user.service.ts` pelo bloco abaixo:
+
+```typescript
+export const toPublicUser = (user: UserRow) => ({
+  id: user.id,
+  email: user.email,
+  name: user.name,
+  createdAt: user.createdAt,
+  userTypeId: user.userTypeId ?? 1,
+  role: user.userTypeId === 2 ? ('ADMIN' as const) : ('ALUNO' as const),
+});
+```
+
+Em seguida, acrescentamos a função `getAllUsersAdmin` no controlador de usuários para que o administrador possa listar todas as contas cadastradas.
+
+**Arquivo: `src/controllers/user.controller.ts` — acréscimo ao final do arquivo**
+
+Acrescente a seguinte função ao final de `src/controllers/user.controller.ts`:
+
+```typescript
+export const getAllUsersAdmin = async (_req: Request, res: Response) => {
+  const users = await UserService.getAllUsers();
+  res.json(users.map(UserService.toPublicUser));
+};
+```
+
+Agora criamos o arquivo de rotas administrativas disponibilizando tanto a listagem geral `GET /admin/users` (usada pelo painel administrativo no React) quanto a consulta individual `GET /admin/users/:id`.
 
 **Arquivo: `src/routes/admin.route.ts`**
 
@@ -324,10 +357,37 @@ import { authMiddleware } from '../middlewares/auth.middleware.js';
 import { requirePermission } from '../middlewares/permission.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { userIdSchema } from '../schemas/user.schema.js';
-import { getUserById } from '../controllers/user.controller.js';
+import { getUserById, getAllUsersAdmin } from '../controllers/user.controller.js';
 
 /**
  * @openapi
+ * components:
+ *   schemas:
+ *     PublicUser:
+ *       type: object
+ *       properties:
+ *         id: { type: integer, minimum: 1 }
+ *         email: { type: string, format: email }
+ *         name: { type: string, nullable: true }
+ *         createdAt: { type: string, format: date-time }
+ *         userTypeId: { type: integer, example: 1 }
+ *         role: { type: string, enum: [ALUNO, ADMIN], example: ALUNO }
+ * /admin/users:
+ *   get:
+ *     summary: Listar todas as contas com permissão administrativa
+ *     tags: [Administração]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       '200':
+ *         description: Lista de todas as contas sem hash de senha.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { $ref: '#/components/schemas/PublicUser' }
+ *       '401': { description: Token ausente ou inválido. }
+ *       '403': { description: Papel sem a permissão users:read:any. }
+ *       '429': { description: Limite de requisições. }
  * /admin/users/{id}:
  *   get:
  *     summary: Consultar uma conta com permissão administrativa
@@ -351,6 +411,7 @@ import { getUserById } from '../controllers/user.controller.js';
  *       '429': { description: Limite de requisições. }
  */
 const router = Router();
+router.get('/admin/users', authMiddleware, requirePermission('users:read:any'), getAllUsersAdmin);
 router.get('/admin/users/:id', authMiddleware, requirePermission('users:read:any'),
   validate(userIdSchema), getUserById);
 export default router;
@@ -445,11 +506,13 @@ set ID_ADMIN=COLE_O_ID_DE_BRUNO
 curl.exe -i http://localhost:3000/admin/users/%ID_ALUNO%
 curl.exe -i -H "Authorization: Bearer %TOKEN_ALUNO%" http://localhost:3000/admin/users/%ID_ALUNO%
 curl.exe -i -H "Authorization: Bearer %TOKEN_ADMIN%" http://localhost:3000/admin/users/%ID_ALUNO%
+curl.exe -i -H "Authorization: Bearer %TOKEN_ALUNO%" http://localhost:3000/admin/users
+curl.exe -i -H "Authorization: Bearer %TOKEN_ADMIN%" http://localhost:3000/admin/users
 curl.exe -i -H "Authorization: Bearer %TOKEN_ADMIN%" http://localhost:3000/users/%ID_ALUNO%
 curl.exe -i -H "Authorization: Bearer %TOKEN_ALUNO%" -H "Content-Type: application/json" -X PUT -d "{\"userTypeId\":2}" http://localhost:3000/users/%ID_ALUNO%
 ```
 
-Espere **401, 403, 200, 403 e 400**. A consulta administrativa deve mostrar Ana sem `password`. A rota pessoal continua protegida.
+Espere **401, 403, 200, 403, 200, 403 e 400**. A consulta administrativa individual deve mostrar Ana sem `password`. A listagem `/admin/users` retorna 403 para a aluna e 200 para o administrador (com a lista completa de contas exibindo `role: "ALUNO"` e `role: "ADMIN"`, pronta para alimentar a tabela do React no capítulo 14). A rota pessoal continua protegida.
 
 Remova o privilégio de Bruno e repita usando **o mesmo token**, sem outro login:
 
@@ -529,7 +592,10 @@ it('RBAC: padrão seguro, permissão atual e proteção contra promoção públi
   expect(otherLogin.status).toBe(200);
   const auth = `Bearer ${login.body.token}`;
   const otherAuth = `Bearer ${otherLogin.body.token}`;
+  expect(login.body.user.role).toBe('ALUNO');
+  expect(login.body.user.userTypeId).toBe(1);
   const path = `/admin/users/${id}`;
+  expect((await request(app).get('/admin/users').set('Authorization', auth)).status).toBe(403);
   expect((await request(app).get(path)).status).toBe(401);
   expect((await request(app).get(path).set('Authorization', 'Bearer invalido')).status).toBe(401);
   expect((await request(app).get(path).set('Authorization', auth)).status).toBe(403);
@@ -542,7 +608,13 @@ it('RBAC: padrão seguro, permissão atual e proteção contra promoção públi
   const allowed = await request(app).get(path).set('Authorization', otherAuth);
   expect(allowed.status).toBe(200);
   expect(allowed.body.id).toBe(id);
+  expect(allowed.body.role).toBe('ALUNO');
   expect(allowed.body).not.toHaveProperty('password');
+  const allUsers = await request(app).get('/admin/users').set('Authorization', otherAuth);
+  expect(allUsers.status).toBe(200);
+  expect(Array.isArray(allUsers.body)).toBe(true);
+  expect(allUsers.body.some((u: any) => u.id === id && u.role === 'ALUNO')).toBe(true);
+  expect(allUsers.body.some((u: any) => u.id === adminId && u.role === 'ADMIN')).toBe(true);
   expect((await request(app).get(path).set('Cookie', `token=${otherLogin.body.token}`)).status).toBe(200);
   expect((await request(app).get(`/users/${id}`).set('Authorization', otherAuth)).status).toBe(403);
   expect((await request(app).put(`/users/${id}`).set('Authorization', otherAuth).send({ name: 'Outro' })).status).toBe(403);
@@ -600,5 +672,5 @@ Em sistemas com várias escolas ou empresas, um administrador deve acessar somen
 
 Referências: [OWASP — autorização](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html) · [Prisma 8 — relações](https://www.prisma.io/docs/orm/fundamentals/relations-and-joins) · [Express 5 — erros](https://expressjs.com/en/guide/error-handling.html).
 
-[← TypeScript](12-guia-pratico-de-typescript.md) · [Índice →](../README.md)
+[← TypeScript](12-guia-pratico-de-typescript.md) · [Índice](../README.md) · [14 · Front-end React com RBAC →](14-front-end-react-rbac.md)
 

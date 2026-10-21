@@ -77,7 +77,8 @@ Cada capítulo apresenta os termos específicos quando eles passam a ser necess�
 | 10 | [Gerador de recursos com Plop](docs/10-automacao-e-geracao-de-codigo.md) | CRUD `Cliente`, quatro arquivos gerados e seis testes adicionais |
 | 11 | [Validação final e operação](docs/11-validacao-ponta-a-ponta.md) | 23 testes, banco, CRUD, cookies e execução compilada conferidos |
 | 12 | [TypeScript no projeto](docs/12-guia-pratico-de-typescript.md) | Guia para estudantes: sintaxe, exemplos práticos e conexões com o código da API |
-| 13 | [Controle de acesso com RBAC](docs/13-controle-de-acesso-com-rbac.md) | Usuários e tipos, permissões por papel, migração segura e testes de autorização |
+| 13 | [Controle de acesso com RBAC](docs/13-controle-de-acesso-com-rbac.md) | Usuários e tipos, permissões por papel, retorno de perfil, listagem administrativa e testes |
+| 14 | [Front-end React com RBAC](docs/14-front-end-react-rbac.md) | Aplicação React (Vite), contexto de autenticação, telas protegidas por perfil e gestão administrativa |
 
 A ordem importa: emitir contrato não aplica tabelas, gerar código não cria modelos e compilar não confirma conexão com o banco.
 
@@ -159,7 +160,7 @@ api/
 | JWT | HS256, emissor/audiência definidos e duração de 15 minutos |
 | Logout | Limpa cookie; cliente descarta Bearer; não revoga JWT já emitido |
 
-Até o capítulo 11, cada conta acessa somente seus próprios dados. O [capítulo 13](docs/13-controle-de-acesso-com-rbac.md) acrescenta os papéis ALUNO e ADMIN e uma permissão de consulta administrativa. Recuperação de senha, revogação geral de JWT, refresh token e permissões individuais sobre contatos exigem implementação própria.
+Até o capítulo 11, cada conta acessa somente seus próprios dados. O [capítulo 13](docs/13-controle-de-acesso-com-rbac.md) acrescenta os papéis ALUNO e ADMIN, permissão de consulta administrativa e expõe o perfil na autenticação. O [capítulo 14](docs/14-front-end-react-rbac.md) constrói o front-end em React consumindo a API com controle de telas por perfil. Recuperação de senha, revogação geral de JWT, refresh token e permissões individuais sobre contatos exigem implementação própria.
 
 ## ▶️ Comandos da API depois de construída
 
