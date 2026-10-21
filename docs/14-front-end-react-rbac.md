@@ -63,9 +63,9 @@ sequenceDiagram
 
 ---
 
-## 2. Configurar o Ambiente React e Cliente HTTP
+## 2. Configurar o Ambiente React, Rotas e Cliente HTTP
 
-**Propósito do passo:** criar a pasta `web` com Vite, instalar o React Router e criar um cliente HTTP configurado para enviar o JWT no cabeçalho `Authorization`.
+**Propósito do passo:** criar a pasta `web` com Vite, instalar o React Router e já estruturar as pastas do projeto separando as rotas em um arquivo dedicado (`src/routes/index.tsx`). Isso economiza tempo e mantém o `App.tsx` limpo desde o início.
 
 Abra uma janela do terminal (CMD) no **diretório pai** da pasta da API (para manter `api` e `web` no mesmo nível):
 
@@ -81,6 +81,8 @@ A estrutura de arquivos será organizada da seguinte forma:
 ```text
 web/
 ├── src/
+│   ├── routes/
+│   │   └── index.tsx          # Arquivo dedicado de rotas (AppRoutes)
 │   ├── services/
 │   │   └── api.ts             # Cliente HTTP com Bearer JWT automático
 │   ├── context/
@@ -93,7 +95,7 @@ web/
 │   ├── components/
 │   │   ├── Navbar.tsx         # Menu com opções conforme o papel
 │   │   └── ProtectedRoute.tsx # Guardião de rotas por perfil
-│   ├── App.tsx                # Roteamento da aplicação
+│   ├── App.tsx                # Componente raiz simplificado (BrowserRouter + Providers)
 │   └── main.tsx
 ├── package.json
 └── vite.config.ts
@@ -818,26 +820,67 @@ export const Navbar: React.FC = () => {
 
 ---
 
-## 7. Configuração Geral de Rotas (`App.tsx`)
+## 7. Arquivo de Rotas Dedicado e Inicialização da Aplicação
 
-**Propósito do passo:** conectar todas as rotas da aplicação no `BrowserRouter`.
+**Propósito do passo:** isolar a declaração das rotas em `src/routes/index.tsx` (`AppRoutes`) para que o `App.tsx` permaneça enxuto e escalável.
+
+### A. Arquivo de Rotas Separado (`src/routes/index.tsx`)
+
+**Arquivo: `web/src/routes/index.tsx`**
+
+Crie a pasta `src/routes` e copie todo o conteúdo abaixo. Todas as rotas públicas, protegidas e restritas por papel ficam concentradas aqui:
+
+<!-- file: web/src/routes/index.tsx -->
+```typescript
+// Arquivo: src/routes/index.tsx
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { ProtectedRoute } from '../components/ProtectedRoute';
+import { LoginPage } from '../pages/LoginPage';
+import { AlunoPage } from '../pages/AlunoPage';
+import { AdminPage } from '../pages/AdminPage';
+import { UnauthorizedPage } from '../pages/UnauthorizedPage';
+
+export const AppRoutes: React.FC = () => {
+  return (
+    <Routes>
+      {/* Rota pública de entrada */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Rota para usuários autenticados (ALUNO e ADMIN) */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/aluno" element={<AlunoPage />} />
+      </Route>
+
+      {/* Rota restrita APENAS a quem tem perfil ADMIN */}
+      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+        <Route path="/admin" element={<AdminPage />} />
+      </Route>
+
+      {/* Rota informativa de erro 403 */}
+      <Route path="/403" element={<UnauthorizedPage />} />
+
+      {/* Redirecionamento padrão */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+};
+```
+
+### B. Componente Raiz Enxuto (`src/App.tsx`)
 
 **Arquivo: `web/src/App.tsx`**
 
-Substitua todo o conteúdo de `web/src/App.tsx`:
+Com as rotas isoladas, o `App.tsx` fica limpo e desacoplado, apenas envelopando os provedores de contexto, a barra de navegação e as rotas:
 
 <!-- file: web/src/App.tsx -->
 ```typescript
 // Arquivo: src/App.tsx
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import { Navbar } from './components/Navbar';
-import { LoginPage } from './pages/LoginPage';
-import { AlunoPage } from './pages/AlunoPage';
-import { AdminPage } from './pages/AdminPage';
-import { UnauthorizedPage } from './pages/UnauthorizedPage';
+import { AppRoutes } from './routes';
 
 export const App: React.FC = () => {
   return (
@@ -846,26 +889,7 @@ export const App: React.FC = () => {
         <div style={{ minHeight: '100vh', backgroundColor: '#f1f5f9', display: 'flex', flexDirection: 'column' }}>
           <Navbar />
           <main style={{ flex: 1 }}>
-            <Routes>
-              {/* Rota pública de entrada */}
-              <Route path="/login" element={<LoginPage />} />
-
-              {/* Rota para usuários autenticados (ALUNO e ADMIN) */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/aluno" element={<AlunoPage />} />
-              </Route>
-
-              {/* Rota restrita APENAS a quem tem perfil ADMIN */}
-              <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-                <Route path="/admin" element={<AdminPage />} />
-              </Route>
-
-              {/* Rota informativa de erro 403 */}
-              <Route path="/403" element={<UnauthorizedPage />} />
-
-              {/* Redirecionamento padrão */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
+            <AppRoutes />
           </main>
         </div>
       </AuthProvider>
