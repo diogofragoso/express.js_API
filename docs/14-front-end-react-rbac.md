@@ -1,16 +1,16 @@
 <!-- Documento: docs/14-front-end-react-rbac.md -->
 
-# 14 · Front-end em React com controle de acesso por perfil (Aluno e Professor)
+# 14 · Front-end em React: RBAC (Aluno e Professor), Ambientes e Deploy no Azure
 
 [← Anterior](13-controle-de-acesso-com-rbac.md) · [Índice](../README.md) · **Etapa 14 de 14**
 
-**Ponto de partida:** A API Express deve estar em execução em `http://localhost:3000` (ou na nuvem no Azure: `https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net`). O front-end React está estruturado na pasta `React-App`, utilizando **React 19 + TypeScript + Vite + React-Bootstrap + React Router**, conectado à API via Axios com suporte híbrido a HttpOnly Cookies e cabeçalhos `Authorization: Bearer <token>`.
+**Ponto de partida:** A API Express pode ser executada localmente em `http://localhost:3000` ou consumida diretamente na nuvem (Azure App Service: `https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net`). O front-end React está estruturado na pasta `React-App`, utilizando **React 19 + TypeScript + Vite + React-Bootstrap + React Router 7**, conectado à API via Axios com suporte híbrido a HttpOnly Cookies e cabeçalhos `Authorization: Bearer <token>`.
 
 ---
 
 ## 🎯 Resultado desta etapa
 
-Uma aplicação web moderna com isolamento estrito de rotas e perfis de usuários:
+Uma aplicação web completa e pronta para produção, cobrindo:
 
 1. **Tela de Login com Modal de Cadastro:**
    - Permite que novos usuários se cadastrem como **Aluno** (`userTypeId: 2`) ou **Professor** (`userTypeId: 3`) diretamente por um modal Bootstrap.
@@ -26,8 +26,12 @@ Uma aplicação web moderna com isolamento estrito de rotas e perfis de usuário
 4. **Guardião de Rotas (`ProtectedRoute.tsx`):**
    - Avalia a autenticação e a lista de papéis permitidos (`allowedRoles`).
    - Garante que **um não possa visualizar a tela do outro**.
-5. **Tela de Acesso Negado (`src/pages/Unauthorized/`):**
-   - Apresenta feedback visual amigável (403) informando a incompatibilidade do perfil e botões para voltar à respectiva área correta.
+5. **Alternância entre Ambiente Local e Produção na Nuvem:**
+   - Gerenciamento seguro por arquivos `.env` e scripts no `package.json`.
+   - Boas práticas com `.gitignore` e modelo `.env.example`.
+6. **Deploy no Azure Static Web Apps sem Erros:**
+   - Correção do erro de pasta de artefatos do Vite (`dist` em vez de `build`).
+   - Resolução do erro 404 ao dar F5 ou acessar URLs diretas (`staticwebapp.config.json`).
 
 ---
 
@@ -75,16 +79,120 @@ React-App/
 │   ├── App.tsx                    # BrowserRouter + AuthProvider + AppRoutes
 │   └── main.tsx
 ├── .env.development               # VITE_API_URL=http://localhost:3000
-├── .env.production                # VITE_API_URL=https://expresst13...azurewebsites.net
+├── .env.production                # VITE_API_URL=https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net
+├── .env.example                   # Modelo público para documentação
+├── .gitignore                     # Ignora .env e arquivos de máquina local
 ├── package.json
 └── vite.config.ts
 ```
 
 ---
 
-## 1. Contexto de Autenticação (`src/context/AuthContext.tsx`)
+## 1. Configuração de Ambientes e Boas Práticas (`.env`)
 
-Gerencia o estado de autenticação em toda a aplicação, mantendo o usuário logado após recarregar a página e integrando com o `localStorage`:
+### Por que NÃO subir o `.env` no Git?
+1. **Segurança no Front-end:** Qualquer variável com prefixo `VITE_` é inserida em texto aberto no código JavaScript compilado e fica acessível a qualquer usuário no navegador (`F12`). Segredos (chaves privadas, senhas de banco) **nunca** devem existir no front-end.
+2. **Evitar Conflitos:** O arquivo `.env` reflete a máquina de quem está desenvolvendo. Subir o `.env` sobrescreveria a porta ou o endereço de outros colegas de equipe ao realizarem `git pull`.
+
+### Arquivos de Ambiente Criados:
+
+**Arquivo: `.env.development`** (usado no desenvolvimento local):
+```env
+# Ambiente de Desenvolvimento Local
+VITE_API_URL=http://localhost:3000
+```
+
+**Arquivo: `.env.production`** (usado para deploy ou testes com a nuvem):
+```env
+# Ambiente de Produção (Azure App Service)
+VITE_API_URL=https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net
+```
+
+**Arquivo: `.env.example`** (modelo seguro que sobe no repositório):
+```env
+# Exemplo de configuração de ambiente para o Front-end
+# Local:
+# VITE_API_URL=http://localhost:3000
+# Produção:
+VITE_API_URL=https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net
+```
+
+**Arquivo: `.gitignore`** (certifique-se de que os arquivos locais estão ignorados):
+```gitignore
+# Arquivos de Ambiente (Segurança e Isolamento Local)
+.env
+.env.local
+.env.*.local
+*.local
+
+# Permite versionar apenas o modelo de exemplo
+!.env.example
+```
+
+---
+
+### Cliente HTTP Dinâmico (`src/services/api.ts`)
+
+O Axios carrega a URL automaticamente a partir da variável `import.meta.env.VITE_API_URL`:
+
+```typescript
+// src/services/api.ts
+import axios from 'axios';
+
+// Obtém a URL da API da variável de ambiente ou usa localhost como padrão
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true, // Essencial para envio de cookies HttpOnly
+});
+
+// Anexa o token JWT Bearer no cabeçalho para garantir compatibilidade cross-domain
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn('Sessão expirada ou não autorizada na API:', API_BASE_URL);
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+---
+
+### Scripts de Alternância Rápida no `package.json`
+
+Adicione scripts no `package.json` para alternar entre os ambientes com apenas um comando no terminal:
+
+```json
+"scripts": {
+  "dev": "vite",
+  "dev:prod": "vite --mode production",
+  "build": "tsc -b && vite build --mode production",
+  "build:local": "tsc -b && vite build --mode development",
+  "lint": "oxlint",
+  "preview": "vite preview"
+}
+```
+
+- **`npm run dev`**: Executa o front-end local consumindo a API local (`http://localhost:3000`).
+- **`npm run dev:prod`**: Executa o front-end local consumindo diretamente a API da Azure.
+- **`npm run build`**: Gera o pacote otimizado apontando para a API de produção da Azure.
+
+---
+
+## 2. Contexto de Autenticação (`src/context/AuthContext.tsx`)
+
+Gerencia a sessão global do usuário, persistindo o estado no `localStorage` e oferecendo um fallback seguro para prevenir que a tela inicial fique em branco:
 
 ```typescript
 // src/context/AuthContext.tsx
@@ -169,7 +277,7 @@ export function useAuth(): AuthContextType {
 
 ---
 
-## 2. Guardião de Rotas com Isolamento de Perfis (`src/components/ProtectedRoute.tsx`)
+## 3. Guardião de Rotas com Isolamento de Perfis (`src/components/ProtectedRoute.tsx`)
 
 O segredo para garantir que **um perfil não consiga visualizar a tela do outro** está na conferência do array `allowedRoles`:
 
@@ -219,9 +327,7 @@ export function ProtectedRoute({ allowedRoles, children }: ProtectedRouteProps) 
 
 ---
 
-## 3. Configuração de Rotas Protegidas (`src/routes/index.tsx`)
-
-As rotas são associadas às suas permissões correspondentes:
+## 4. Configuração Centralizada de Rotas (`src/routes/index.tsx`)
 
 ```typescript
 // src/routes/index.tsx
@@ -259,6 +365,17 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      {/* Rota 404 amigável */}
+      <Route
+        path="*"
+        element={
+          <div className="container py-5 text-center">
+            <h3>404 - Página não encontrada</h3>
+            <a href="/" className="btn btn-primary mt-3">Voltar para o Início</a>
+          </div>
+        }
+      />
     </Routes>
   );
 }
@@ -266,57 +383,83 @@ export function AppRoutes() {
 
 ---
 
-## 4. Deploy no Azure Static Web Apps: Evitando Erro 404 no F5 (`staticwebapp.config.json`)
+## 5. Configuração do Back-end no Azure App Service
 
-Como utilizamos o `react-router-dom`, as rotas (`/login`, `/aluno`, `/professor`, etc.) são resolvidas pelo JavaScript no navegador (Single Page Application - SPA). Ao dar **F5** ou acessar uma rota diretamente pela URL em produção, o servidor web tradicional tentará buscar uma pasta física no disco e retornará **404 Not Found**.
+Para permitir requisições vindas do front-end na nuvem e local simultaneamente:
 
-Para resolver isso no **Azure Static Web Apps**, adicionamos o arquivo [`public/staticwebapp.config.json`](file:///C:/Users/diogo.fsilva/Documents/T13/React-App/public/staticwebapp.config.json). Durante o `npm run build`, o Vite copia esse arquivo automaticamente para a raiz de `dist/`:
-
-```json
-{
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.{png,jpg,gif,ico,svg}"]
-  },
-  "responseOverrides": {
-    "404": {
-      "rewrite": "/index.html",
-      "statusCode": 200
-    }
-  }
-}
-```
-
-- **`navigationFallback`**: redireciona qualquer requisição de rota de página para o `/index.html`, permitindo que o `react-router-dom` processe a rota sem erro 404.
-- **`exclude`**: impede que arquivos estáticos reais (CSS, JS, imagens) sejam reescritos caso estejam faltando.
+1. **Origens Autorizadas ([`src/config/origins.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/config/origins.ts)):**
+   Aceita `http://localhost:5173`, `http://localhost:3000` e a URL da Azure, além de ler qualquer URL informada em `FRONTEND_ORIGIN` (separadas por vírgula).
+2. **Cookies Cross-Domain ([`src/controllers/auth.controller.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/controllers/auth.controller.ts)):**
+   Em produção (`NODE_ENV === 'production'`), aplica `sameSite: 'none'` e `secure: true`.
+3. **Variáveis de Ambiente no Portal da Azure:**
+   No portal Azure (**Seu App Service ➔ Configuração ➔ Configurações do Aplicativo**), defina:
+   - `NODE_ENV`: `production`
+   - `DATABASE_URL`: `postgresql://usuario:senha@host:5432/banco?sslmode=require`
+   - `JWT_SECRET`: Chave secreta aleatória com mais de 32 caracteres.
+   - `API_ORIGIN`: `https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net`
+   - `FRONTEND_ORIGIN`: `http://localhost:5173,https://sua-url-do-front.azurestaticapps.net`
 
 ---
 
-## 🧪 Como Testar o Isolamento na Prática
+## 6. Deploy no Azure Static Web Apps: Como Evitar Erros Comuns
 
-1. Inicie a API e o React nos respectivos terminais:
+### ⚠️ Erro 1: "The app build failed to produce artifact folder: 'build'"
+- **Causa:** O assistente da Azure sugere por padrão a predefinição "React" antiga (Create React App), que gera os arquivos na pasta `build`. O **Vite** gera o build na pasta **`dist`**!
+- **Solução:** No arquivo de workflow do GitHub Actions (`.github/workflows/azure-static-web-apps-*.yml`), altere a linha `output_location`:
+  ```yaml
+  ###### Configuração do Build ######
+  app_location: "/" 
+  api_location: "" 
+  output_location: "dist" # <-- Altere de "build" para "dist"
+  ```
+
+### ⚠️ Erro 2: Erro 404 ao dar F5 ou acessar URLs diretas (Fallback SPA)
+- **Causa:** Por ser uma SPA (*Single Page Application*), rotas como `/login` ou `/aluno` existem apenas na memória do navegador. Ao dar F5, o servidor busca um arquivo `/login/index.html` inexistente no disco e retorna **404 Not Found**.
+- **Solução:** Crie o arquivo `public/staticwebapp.config.json` no projeto React:
+  ```json
+  {
+    "navigationFallback": {
+      "rewrite": "/index.html",
+      "exclude": ["/assets/*", "/*.{png,jpg,gif,ico,svg}"]
+    },
+    "responseOverrides": {
+      "404": {
+        "rewrite": "/index.html",
+        "statusCode": 200
+      }
+    }
+  }
+  ```
+  O Vite copia automaticamente esse arquivo de `public/` para a raiz de `dist/` durante o `npm run build`.
+
+---
+
+## 🧪 Roteiro de Validação Prática em Sala de Aula
+
+1. **Iniciar a aplicação localmente:**
    ```bat
-   # Terminal 1 (API Express)
+   # Terminal 1: API
    cd express.js_API
-   npm.cmd run dev
+   npm run dev
 
-   # Terminal 2 (React Frontend)
+   # Terminal 2: React
    cd React-App
-   npm.cmd run dev
+   npm run dev
    ```
-2. Acesse `http://localhost:5173/login`.
-3. Abra o modal **"Cadastre-se como Aluno ou Professor"**:
-   - Cadastre uma conta como **Aluno** (ex: `aluno@teste.com`).
-   - Cadastre outra conta como **Professor** (ex: `professor@teste.com`).
-4. **Teste 1: Usuário Aluno logado:**
-   - Faça login com a conta de aluno.
-   - O sistema o leva automaticamente para `/aluno`.
-   - Clique em **"Tentar Acessar Área do Professor"** (ou digite `/professor` na URL).
-   - O React intercepta a navegação e exibe a tela **403 - Acesso Negado**.
-5. **Teste 2: Usuário Professor logado:**
-   - Faça logout e entre com a conta do professor.
-   - O sistema o leva automaticamente para `/professor`.
-   - Clique em **"Tentar Acessar Área do Aluno"** (ou digite `/aluno` na URL).
-   - O React intercepta a navegação e exibe a tela **403 - Acesso Negado**.
-6. **Teste 3: Recarregar a página (F5):**
-   - Em qualquer tela protegida (`/aluno` ou `/professor`), pressione F5. A sessão permanece ativa graças ao `localStorage` e ao `staticwebapp.config.json`.
+2. **Testar Autocadastro de Perfis:**
+   - Acesse `http://localhost:5173/login`.
+   - Clique em **"Cadastre-se como Aluno ou Professor"**.
+   - Crie uma conta de **Aluno** (`aluno@teste.com`) e uma de **Professor** (`professor@teste.com`).
+3. **Testar Isolamento de Aluno:**
+   - Faça login com o Aluno ➔ Sistema redireciona para `/aluno`.
+   - Clique em **"Tentar Acessar Área do Professor"** (ou digite `/professor`).
+   - O guardião de rota intercepta e exibe a tela **403 - Acesso Negado**.
+4. **Testar Isolamento de Professor:**
+   - Faça login com o Professor ➔ Sistema redireciona para `/professor`.
+   - Clique em **"Tentar Acessar Área do Aluno"** (ou digite `/aluno`).
+   - O guardião de rota intercepta e exibe a tela **403 - Acesso Negado**.
+5. **Testar Conexão com a Nuvem:**
+   - No terminal do React, execute: `npm run dev:prod`.
+   - A aplicação funcionará conectando-se diretamente à API da Azure sem precisar subir a API local.
+6. **Testar F5 e Atualização de Página:**
+   - Em qualquer tela protegida, aperte `F5`. A sessão permanece ativa e a rota é mantida sem erros.

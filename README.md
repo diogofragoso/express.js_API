@@ -78,7 +78,7 @@ Cada capítulo apresenta os termos específicos quando eles passam a ser necess�
 | 11 | [Validação final e operação](docs/11-validacao-ponta-a-ponta.md) | 23 testes, banco, CRUD, cookies e execução compilada conferidos |
 | 12 | [TypeScript no projeto](docs/12-guia-pratico-de-typescript.md) | Guia para estudantes: sintaxe, exemplos práticos e conexões com o código da API |
 | 13 | [Controle de acesso com RBAC](docs/13-controle-de-acesso-com-rbac.md) | Usuários e tipos, permissões por papel, retorno de perfil, listagem administrativa e testes |
-| 14 | [Front-end React com RBAC](docs/14-front-end-react-rbac.md) | Aplicação React (Vite), contexto de autenticação, telas protegidas por perfil e gestão administrativa |
+| 14 | [Front-end React: RBAC, Ambientes e Azure](docs/14-front-end-react-rbac.md) | Aplicação React (Vite), perfis Aluno/Professor, rotas protegidas, alternância de ambientes e deploy no Azure |
 
 A ordem importa: emitir contrato não aplica tabelas, gerar código não cria modelos e compilar não confirma conexão com o banco.
 
