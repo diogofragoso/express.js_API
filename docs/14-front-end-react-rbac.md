@@ -420,8 +420,11 @@ Para permitir requisições vindas do front-end na nuvem e local simultaneamente
    - Lê qualquer URL adicional informada na variável `FRONTEND_ORIGIN` (separadas por vírgula).
 3. **Validação de Origem em Mutações com Cookie ([`src/middlewares/auth.middleware.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/middlewares/auth.middleware.ts)):**
    - Utiliza `isOriginAllowed(origin)` para validar dinamicamente chamadas com cookie do Static Web Apps.
-4. **Cookies Cross-Domain ([`src/controllers/auth.controller.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/controllers/auth.controller.ts)):**
-   - Em produção (`NODE_ENV === 'production'`), aplica `sameSite: 'none'` e `secure: true`.
+4. **Cookies Cross-Domain Dinâmicos ([`src/controllers/auth.controller.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/controllers/auth.controller.ts)):**
+   - Utiliza a função `getCookieOptions(req)` para identificar dinamicamente conexões HTTPS ou chamadas remotas (`x-forwarded-proto`, `req.secure` ou origem externa do Azure Static Web Apps).
+   - Aplica obrigatoriamente `secure: true` e `sameSite: 'none'`, impedindo que o navegador rejeite o cookie HttpOnly caso a variável `NODE_ENV` não esteja definida como `production` no Azure.
+   - Em ambiente local (`localhost`), utiliza `secure: false` e `sameSite: 'lax'`.
+   - Script de teste automatizado disponível em `src/scripts/test-cookie-security.ts`.
 5. **Variáveis de Ambiente no Portal da Azure:**
    No portal Azure (**Seu App Service ➔ Configuração ➔ Configurações do Aplicativo**), defina:
    - `NODE_ENV`: `production`

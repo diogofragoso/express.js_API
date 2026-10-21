@@ -3,23 +3,35 @@ import type { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service.js';
 import { env } from '../config/env.js';
 
-const isProduction = env.NODE_ENV === 'production';
+/**
+ * Determina dinamicamente as opções de cookie com base no protocolo e contexto da requisição.
+ * Garante que em ambientes na nuvem (Azure Static Web Apps + Azure App Service)
+ * o cookie receba obrigatoriamente 'secure: true' e 'sameSite: none', permitindo que o navegador
+ * armazene o cookie HttpOnly em contextos cross-domain sem bloqueio.
+ */
+export const getCookieOptions = (req: Request) => {
+  const isHttps = req.secure || req.get('x-forwarded-proto') === 'https' || env.NODE_ENV === 'production';
+  const origin = req.get('origin') || '';
+  const isCrossDomain = Boolean(origin && !origin.includes('localhost') && !origin.includes('127.0.0.1'));
+  const useSecure = isHttps || isCrossDomain;
 
-// Em produção cross-domain (ex: Azure + Vercel / Local), 'none' e secure=true são obrigatórios para cookies
-const cookieOptions = {
-  httpOnly: true,
-  secure: isProduction,
-  sameSite: isProduction ? ('none' as const) : ('lax' as const),
-  path: '/',
+  return {
+    httpOnly: true,
+    secure: useSecure,
+    sameSite: useSecure ? ('none' as const) : ('lax' as const),
+    path: '/',
+  };
 };
 
 export const login = async (req: Request, res: Response) => {
   const result = await AuthService.login(req.body);
-  res.cookie('token', result.token, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
+  const options = getCookieOptions(req);
+  res.cookie('token', result.token, { ...options, maxAge: 15 * 60 * 1000 });
   res.json(result);
 };
 
-export const logout = (_req: Request, res: Response) => {
-  res.clearCookie('token', cookieOptions);
+export const logout = (req: Request, res: Response) => {
+  const options = getCookieOptions(req);
+  res.clearCookie('token', options);
   res.status(204).send();
 };
