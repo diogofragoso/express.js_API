@@ -31,8 +31,8 @@ A conexão fornecida em `api/.env` foi usada para criar dois bancos vazios e exc
 | Vitest / coverage-v8 | 4.1.11 |
 | Plop | 4.0.5 |
 | Navegador | Microsoft Edge instalado; automação externa à API |
-| Desenvolvimento | `express_t13_api5_dev_20261002` |
-| Integração | `express_t13_api5_test_20261002` |
+| Desenvolvimento | `express_api5_dev_20261002` |
+| Integração | `express_api5_test_20261002` |
 
 ## Falha encontrada e repetição
 

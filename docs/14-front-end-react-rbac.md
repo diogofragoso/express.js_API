@@ -4,7 +4,7 @@
 
 [← Anterior](13-controle-de-acesso-com-rbac.md) · [Índice](../README.md) · **Etapa 14 de 14**
 
-**Ponto de partida:** A API Express deve estar em execução em `http://localhost:3000`. O front-end React está estruturado na pasta `React-App`, utilizando **React 19 + TypeScript + Vite + React-Bootstrap + React Router**, conectado à API via Axios com suporte híbrido a HttpOnly Cookies e cabeçalhos `Authorization: Bearer <token>`.
+**Ponto de partida:** A API Express deve estar em execução em `http://localhost:3000` (ou na nuvem no Azure: `https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net`). O front-end React está estruturado na pasta `React-App`, utilizando **React 19 + TypeScript + Vite + React-Bootstrap + React Router**, conectado à API via Axios com suporte híbrido a HttpOnly Cookies e cabeçalhos `Authorization: Bearer <token>`.
 
 ---
 
@@ -47,6 +47,9 @@ Uma aplicação web moderna com isolamento estrito de rotas e perfis de usuário
 
 ```text
 React-App/
+├── public/
+│   ├── staticwebapp.config.json   # Regras de roteamento SPA e fallback F5 no Azure
+│   └── favicon.svg
 ├── src/
 │   ├── components/
 │   │   └── ProtectedRoute.tsx     # Guardião que impede Aluno ver Professor e vice-versa
@@ -71,6 +74,8 @@ React-App/
 │   │   └── index.ts               # Tipagens TypeScript (User, CreateUserInput, etc.)
 │   ├── App.tsx                    # BrowserRouter + AuthProvider + AppRoutes
 │   └── main.tsx
+├── .env.development               # VITE_API_URL=http://localhost:3000
+├── .env.production                # VITE_API_URL=https://expresst13...azurewebsites.net
 ├── package.json
 └── vite.config.ts
 ```
@@ -96,7 +101,15 @@ export interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  token: null,
+  loading: false,
+  login: async () => { throw new Error('AuthProvider não inicializado.'); },
+  logout: async () => {},
+};
+
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -104,19 +117,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const savedToken = localStorage.getItem('token');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch {
-        localStorage.removeItem('user');
-      }
+    try {
+      const savedUser = localStorage.getItem('user');
+      const savedToken = localStorage.getItem('token');
+      if (savedUser) setUser(JSON.parse(savedUser));
+      if (savedToken) setToken(savedToken);
+    } catch {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+    } finally {
+      setLoading(false);
     }
-    if (savedToken) {
-      setToken(savedToken);
-    }
-    setLoading(false);
   }, []);
 
   const login = async (credentials: LoginCredentials): Promise<User> => {
@@ -150,10 +161,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuth() {
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth deve ser usado dentro de AuthProvider');
-  return context;
+  return context ?? defaultAuthContext;
 }
 ```
 
@@ -256,16 +266,29 @@ export function AppRoutes() {
 
 ---
 
-## 4. Telas em `src/pages/`
+## 4. Deploy no Azure Static Web Apps: Evitando Erro 404 no F5 (`staticwebapp.config.json`)
 
-### A. Tela do Aluno (`src/pages/Aluno/index.tsx`)
-Exibe o painel do estudante, listando suas disciplinas e notas, além de um botão de teste prático para tentar navegar até `/professor` e constatar o bloqueio.
+Como utilizamos o `react-router-dom`, as rotas (`/login`, `/aluno`, `/professor`, etc.) são resolvidas pelo JavaScript no navegador (Single Page Application - SPA). Ao dar **F5** ou acessar uma rota diretamente pela URL em produção, o servidor web tradicional tentará buscar uma pasta física no disco e retornará **404 Not Found**.
 
-### B. Tela do Professor (`src/pages/Professor/index.tsx`)
-Exibe o painel docente, listando turmas coordenadas e botões para chamadas e lançamento de notas, com botão de teste para tentar navegar até `/aluno` e constatar o bloqueio.
+Para resolver isso no **Azure Static Web Apps**, adicionamos o arquivo [`public/staticwebapp.config.json`](file:///C:/Users/diogo.fsilva/Documents/T13/React-App/public/staticwebapp.config.json). Durante o `npm run build`, o Vite copia esse arquivo automaticamente para a raiz de `dist/`:
 
-### C. Tela de Acesso Negado (`src/pages/Unauthorized/index.tsx`)
-Apresenta o alerta amigável de erro HTTP 403, identificando qual perfil está conectado e fornecendo um botão direto para retornar à sua área permitida ou trocar de conta.
+```json
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/*.{png,jpg,gif,ico,svg}"]
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html",
+      "statusCode": 200
+    }
+  }
+}
+```
+
+- **`navigationFallback`**: redireciona qualquer requisição de rota de página para o `/index.html`, permitindo que o `react-router-dom` processe a rota sem erro 404.
+- **`exclude`**: impede que arquivos estáticos reais (CSS, JS, imagens) sejam reescritos caso estejam faltando.
 
 ---
 
@@ -295,3 +318,5 @@ Apresenta o alerta amigável de erro HTTP 403, identificando qual perfil está c
    - O sistema o leva automaticamente para `/professor`.
    - Clique em **"Tentar Acessar Área do Aluno"** (ou digite `/aluno` na URL).
    - O React intercepta a navegação e exibe a tela **403 - Acesso Negado**.
+6. **Teste 3: Recarregar a página (F5):**
+   - Em qualquer tela protegida (`/aluno` ou `/professor`), pressione F5. A sessão permanece ativa graças ao `localStorage` e ao `staticwebapp.config.json`.
