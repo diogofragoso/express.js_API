@@ -4,7 +4,7 @@
 
 [← Anterior](13-controle-de-acesso-com-rbac.md) · [Índice](../README.md) · **Etapa 14 de 14**
 
-**Ponto de partida:** A API Express pode ser executada localmente em `http://localhost:3000` ou consumida diretamente na nuvem (Azure App Service: `https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net`). O front-end React está estruturado na pasta `React-App`, utilizando **React 19 + TypeScript + Vite + React-Bootstrap + React Router 7**, conectado à API via Axios com suporte híbrido a HttpOnly Cookies e cabeçalhos `Authorization: Bearer <token>`.
+**Ponto de partida:** A API Express pode ser executada localmente em `http://localhost:3000` ou consumida diretamente na nuvem (Azure App Service: `https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net`). O front-end React está estruturado na pasta `React-App`, utilizando **React 19 + TypeScript + Vite + React-Bootstrap + React Router 7**, conectado à API via Axios com autenticação 100% segura por **Cookies HttpOnly**.
 
 ---
 
@@ -14,7 +14,7 @@ Uma aplicação web completa e pronta para produção, cobrindo:
 
 1. **Tela de Login com Modal de Cadastro:**
    - Permite que novos usuários se cadastrem como **Aluno** (`userTypeId: 2`) ou **Professor** (`userTypeId: 3`) diretamente por um modal Bootstrap.
-   - Autentica o usuário, recebe o token JWT e identifica o perfil (`role: 'aluno' | 'professor' | 'admin'`).
+   - Autentica o usuário recebendo o cookie `HttpOnly` com o token JWT e identifica o perfil (`role: 'aluno' | 'professor' | 'admin'`).
 2. **Tela Exclusiva do Aluno (`src/pages/Aluno/`):**
    - Acessível apenas por contas com perfil `aluno`.
    - Exibe dados cadastrais, disciplinas em andamento e notas.
@@ -26,10 +26,13 @@ Uma aplicação web completa e pronta para produção, cobrindo:
 4. **Guardião de Rotas (`ProtectedRoute.tsx`):**
    - Avalia a autenticação e a lista de papéis permitidos (`allowedRoles`).
    - Garante que **um não possa visualizar a tela do outro**.
-5. **Alternância entre Ambiente Local e Produção na Nuvem:**
+5. **Autenticação Segura com Cookies HttpOnly (Sem LocalStorage):**
+   - Elimina o armazenamento de tokens no `localStorage`, prevenindo vazamento de credenciais via ataques XSS.
+   - Restauração de sessão real e automática ao dar F5 via chamada `GET /users` com `withCredentials: true`.
+6. **Alternância entre Ambiente Local e Produção na Nuvem:**
    - Gerenciamento seguro por arquivos `.env` e scripts no `package.json`.
    - Boas práticas com `.gitignore` e modelo `.env.example`.
-6. **Deploy no Azure Static Web Apps sem Erros:**
+7. **Deploy no Azure Static Web Apps sem Erros:**
    - Correção do erro de pasta de artefatos do Vite (`dist` em vez de `build`).
    - Resolução do erro 404 ao dar F5 ou acessar URLs diretas (`staticwebapp.config.json`).
 
@@ -58,7 +61,7 @@ React-App/
 │   ├── components/
 │   │   └── ProtectedRoute.tsx     # Guardião que impede Aluno ver Professor e vice-versa
 │   ├── context/
-│   │   └── AuthContext.tsx        # Contexto global: user, token, login, logout
+│   │   └── AuthContext.tsx        # Contexto global seguro (sessão via HttpOnly Cookie)
 │   ├── pages/
 │   │   ├── Home/
 │   │   │   └── index.tsx          # Página inicial com links de teste de proteção
@@ -73,7 +76,7 @@ React-App/
 │   ├── routes/
 │   │   └── index.tsx              # Declaração das rotas públicas e protegidas
 │   ├── services/
-│   │   └── api.ts                 # Instância Axios com cookies e Bearer token
+│   │   └── api.ts                 # Instância Axios com withCredentials: true
 │   ├── types/
 │   │   └── index.ts               # Tipagens TypeScript (User, CreateUserInput, etc.)
 │   ├── App.tsx                    # BrowserRouter + AuthProvider + AppRoutes
@@ -131,9 +134,9 @@ VITE_API_URL=https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.
 
 ---
 
-### Cliente HTTP Dinâmico (`src/services/api.ts`)
+### Cliente HTTP com Cookies HttpOnly (`src/services/api.ts`)
 
-O Axios carrega a URL automaticamente a partir da variável `import.meta.env.VITE_API_URL`:
+O Axios carrega a URL automaticamente a partir da variável `import.meta.env.VITE_API_URL` e transporta os cookies HttpOnly em todas as requisições:
 
 ```typescript
 // src/services/api.ts
@@ -144,16 +147,8 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:30
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // Essencial para envio de cookies HttpOnly
-});
-
-// Anexa o token JWT Bearer no cabeçalho para garantir compatibilidade cross-domain
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  withCredentials: true, // ESSENCIAL: envia cookies HttpOnly automaticamente
+  timeout: 10000,
 });
 
 api.interceptors.response.use(
@@ -166,6 +161,10 @@ api.interceptors.response.use(
   }
 );
 ```
+
+> [!IMPORTANT]
+> **Por que NUNCA usar `localStorage` para tokens JWT:**
+> Salvar tokens no `localStorage` torna a aplicação vulnerável a ataques XSS (*Cross-Site Scripting*), pois qualquer script malicioso no navegador pode executar `localStorage.getItem('token')` e roubar a credencial. Com cookies `HttpOnly`, o JavaScript não tem acesso ao token e o navegador anexa o cookie automaticamente nas requisições graças ao `withCredentials: true`.
 
 ---
 
@@ -192,7 +191,7 @@ Adicione scripts no `package.json` para alternar entre os ambientes com apenas u
 
 ## 2. Contexto de Autenticação (`src/context/AuthContext.tsx`)
 
-Gerencia a sessão global do usuário, persistindo o estado no `localStorage` e oferecendo um fallback seguro para prevenir que a tela inicial fique em branco:
+Gerencia a sessão global do usuário com segurança, restaurando a sessão diretamente através do cookie `HttpOnly` via `GET /users` ao recarregar a tela (F5), sem jamais expor o token no `localStorage`:
 
 ```typescript
 // src/context/AuthContext.tsx
@@ -203,6 +202,7 @@ import { api } from '../services/api';
 
 export interface AuthContextType {
   user: User | null;
+  /** @deprecated O token JWT agora fica 100% protegido em cookie HttpOnly gerenciado pelo navegador */
   token: string | null;
   loading: boolean;
   login: (credentials: LoginCredentials) => Promise<User>;
@@ -221,49 +221,71 @@ const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Restaura a sessão ao carregar a aplicação utilizando exclusivamente o cookie HttpOnly
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem('user');
-      const savedToken = localStorage.getItem('token');
-      if (savedUser) setUser(JSON.parse(savedUser));
-      if (savedToken) setToken(savedToken);
-    } catch {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-    } finally {
-      setLoading(false);
+    let isMounted = true;
+
+    async function restoreSession() {
+      try {
+        // Envia requisição com withCredentials: true.
+        // O navegador anexa automaticamente o cookie HttpOnly 'token'
+        const response = await api.get<User[]>('/users');
+        if (isMounted) {
+          const currentUser = response.data?.[0] ?? null;
+          setUser(currentUser);
+        }
+      } catch {
+        if (isMounted) {
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          // Higienização de segurança: garante que o localStorage não contenha tokens antigos
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setLoading(false);
+        }
+      }
     }
+
+    restoreSession();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = async (credentials: LoginCredentials): Promise<User> => {
+    // Ao efetuar login, o servidor Express define o cookie HttpOnly (token)
+    // via cabeçalho Set-Cookie com SameSite=None (ou Lax) e Secure=true.
     const response = await api.post<LoginResponse>('/login', credentials);
-    const { token: receivedToken, user: loggedUser } = response.data;
+    const { user: loggedUser } = response.data;
 
-    if (receivedToken) {
-      localStorage.setItem('token', receivedToken);
-      setToken(receivedToken);
-    }
-    localStorage.setItem('user', JSON.stringify(loggedUser));
+    // Higieniza o localStorage: o token NUNCA deve ser gravado no localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
     setUser(loggedUser);
     return loggedUser;
   };
 
   const logout = async () => {
     try {
+      // Notifica o backend para invalidar e limpar o cookie HttpOnly (res.clearCookie)
       await api.post('/logout');
+    } catch (err) {
+      console.warn('Erro ao efetuar logout na API:', err);
     } finally {
-      localStorage.removeItem('user');
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       setUser(null);
-      setToken(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, token: null, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -385,15 +407,22 @@ export function AppRoutes() {
 
 ## 5. Configuração do Back-end no Azure App Service
 
-Para permitir requisições vindas do front-end na nuvem e local simultaneamente:
+Para permitir requisições vindas do front-end na nuvem e local simultaneamente com cookies HttpOnly seguros:
 
-1. **Origens Autorizadas Dinâmicas ([`src/config/origins.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/config/origins.ts)):**
+1. **Proxy Reverso (`src/app.ts`):**
+   ```typescript
+   export const app = express();
+   app.set('trust proxy', 1); // Indispensável atrás do proxy ARR da Azure
+   ```
+2. **Origens Autorizadas Dinâmicas ([`src/config/origins.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/config/origins.ts)):**
    - Aceita `http://localhost:5173` e `http://localhost:3000` para testes locais.
    - Aceita dinamicamente qualquer subdomínio do Azure Static Web Apps (`*.azurestaticapps.net`, incluindo ambientes de preview como `.5.azurestaticapps.net`).
    - Lê qualquer URL adicional informada na variável `FRONTEND_ORIGIN` (separadas por vírgula).
-2. **Cookies Cross-Domain ([`src/controllers/auth.controller.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/controllers/auth.controller.ts)):**
+3. **Validação de Origem em Mutações com Cookie ([`src/middlewares/auth.middleware.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/middlewares/auth.middleware.ts)):**
+   - Utiliza `isOriginAllowed(origin)` para validar dinamicamente chamadas com cookie do Static Web Apps.
+4. **Cookies Cross-Domain ([`src/controllers/auth.controller.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/controllers/auth.controller.ts)):**
    - Em produção (`NODE_ENV === 'production'`), aplica `sameSite: 'none'` e `secure: true`.
-3. **Variáveis de Ambiente no Portal da Azure:**
+5. **Variáveis de Ambiente no Portal da Azure:**
    No portal Azure (**Seu App Service ➔ Configuração ➔ Configurações do Aplicativo**), defina:
    - `NODE_ENV`: `production`
    - `DATABASE_URL`: `postgresql://usuario:senha@host:5432/banco?sslmode=require`
@@ -461,8 +490,8 @@ Para permitir requisições vindas do front-end na nuvem e local simultaneamente
    - Faça login com o Professor ➔ Sistema redireciona para `/professor`.
    - Clique em **"Tentar Acessar Área do Aluno"** (ou digite `/aluno`).
    - O guardião de rota intercepta e exibe a tela **403 - Acesso Negado**.
-5. **Testar Conexão com a Nuvem:**
-   - No terminal do React, execute: `npm run dev:prod`.
-   - A aplicação funcionará conectando-se diretamente à API da Azure sem precisar subir a API local.
+5. **Auditar o Armazenamento no DevTools (F12):**
+   - Acesse **Application ➔ Storage ➔ Local Storage**: Confirme que `token` **NÃO** existe.
+   - Acesse **Application ➔ Storage ➔ Cookies**: Confirme que o cookie `token` está presente com a marcação **HttpOnly** ativa.
 6. **Testar F5 e Atualização de Página:**
-   - Em qualquer tela protegida, aperte `F5`. A sessão permanece ativa e a rota é mantida sem erros.
+   - Em qualquer tela protegida, aperte `F5`. O `useEffect` do `AuthProvider` dispara uma requisição `GET /users`, o navegador anexa o cookie `HttpOnly` e a sessão é mantida com sucesso.

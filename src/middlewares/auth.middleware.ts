@@ -2,7 +2,7 @@
 import type { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
-import { getAllowedOrigins } from '../config/origins.js';
+import { isOriginAllowed } from '../config/origins.js';
 import { db } from '../prisma/db.js';
 
 export const authMiddleware: RequestHandler = async (req, res, next) => {
@@ -26,8 +26,7 @@ export const authMiddleware: RequestHandler = async (req, res, next) => {
   const unsafe = !['GET', 'HEAD', 'OPTIONS'].includes(req.method);
   if (authorization === undefined && unsafe) {
     const origin = req.get('origin');
-    const allowed = getAllowedOrigins();
-    if (!origin || !allowed.includes(origin)) {
+    if (!origin || !isOriginAllowed(origin)) {
       res.status(403).json({ error: 'Origem obrigatória e confiável para autenticação por cookie.' });
       return;
     }

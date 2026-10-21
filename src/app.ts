@@ -12,6 +12,11 @@ import { limiter, loginLimiter } from './middlewares/rateLimit.middleware.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 
 export const app = express();
+
+// Configuração essencial para execução atrás de proxies reversos (Azure App Service / ARR)
+// Permite que o Express identifique conexões HTTPS seguras e os IPs reais dos clientes
+app.set('trust proxy', 1);
+
 app.use(morganMiddleware);
 app.use(helmet({
   contentSecurityPolicy: env.NODE_ENV === 'production' ? undefined : {
