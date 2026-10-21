@@ -2,6 +2,12 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
+// Se DATABASE_URL não estiver definida explicitamente, monta a partir das variáveis individuais
+if (!process.env.DATABASE_URL && process.env.DB_HOST && process.env.DB_USER && process.env.DB_NAME) {
+  const pass = process.env.DB_PASSWORD ? process.env.DB_PASSWORD.replace(/^"|"$/g, '') : '';
+  process.env.DATABASE_URL = `postgresql://${process.env.DB_USER}:${encodeURIComponent(pass)}@${process.env.DB_HOST}:5432/${process.env.DB_NAME}`;
+}
+
 const origin = z.url().refine(value => {
   const url = new URL(value);
   return ['http:', 'https:'].includes(url.protocol) && url.origin === value;

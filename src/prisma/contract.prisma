@@ -38,15 +38,25 @@ model TelFuncionario{
 
 }
 
-
 model User {
-  id        Int         @id(map: "user_pkey") @default(autoincrement())
-  createdAt Timestamptz @default(now())
-  email     String      @unique(map: "user_email_key")
-  name      String?
-  password  String
+  id         Int         @id(map: "user_pkey") @default(autoincrement())
+  createdAt  Timestamptz @default(now())
+  email      String      @unique(map: "user_email_key")
+  name       String?
+  password   String
+  userTypeId Int         @default(1)
+  userType   UserType    @relation(fields: [userTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "user_tipo_user_fk", index: false)
 
   @@map("user")
+}
+
+model UserType {
+  id    Int    @id(map: "tipo_user_pkey") @default(autoincrement())
+  code  String @unique(map: "tipo_user_code_key")
+  name  String
+  users User[]
+
+  @@map("tipo_user")
 }
 
 model Funcionario{
@@ -56,5 +66,3 @@ model Funcionario{
   email String  
   @@map("funcionario")
 }
-
-
