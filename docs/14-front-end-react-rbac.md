@@ -387,17 +387,20 @@ export function AppRoutes() {
 
 Para permitir requisições vindas do front-end na nuvem e local simultaneamente:
 
-1. **Origens Autorizadas ([`src/config/origins.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/config/origins.ts)):**
-   Aceita `http://localhost:5173`, `http://localhost:3000` e a URL da Azure, além de ler qualquer URL informada em `FRONTEND_ORIGIN` (separadas por vírgula).
+1. **Origens Autorizadas Dinâmicas ([`src/config/origins.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/config/origins.ts)):**
+   - Aceita `http://localhost:5173` e `http://localhost:3000` para testes locais.
+   - Aceita dinamicamente qualquer subdomínio do Azure Static Web Apps (`*.azurestaticapps.net`, incluindo ambientes de preview como `.5.azurestaticapps.net`).
+   - Lê qualquer URL adicional informada na variável `FRONTEND_ORIGIN` (separadas por vírgula).
 2. **Cookies Cross-Domain ([`src/controllers/auth.controller.ts`](file:///C:/Users/diogo.fsilva/Documents/T13/express.js_API/src/controllers/auth.controller.ts)):**
-   Em produção (`NODE_ENV === 'production'`), aplica `sameSite: 'none'` e `secure: true`.
+   - Em produção (`NODE_ENV === 'production'`), aplica `sameSite: 'none'` e `secure: true`.
 3. **Variáveis de Ambiente no Portal da Azure:**
    No portal Azure (**Seu App Service ➔ Configuração ➔ Configurações do Aplicativo**), defina:
    - `NODE_ENV`: `production`
    - `DATABASE_URL`: `postgresql://usuario:senha@host:5432/banco?sslmode=require`
    - `JWT_SECRET`: Chave secreta aleatória com mais de 32 caracteres.
    - `API_ORIGIN`: `https://expresst13-gtazeuceene4a2d4.canadacentral-01.azurewebsites.net`
-   - `FRONTEND_ORIGIN`: `http://localhost:5173,https://sua-url-do-front.azurestaticapps.net`
+   - `FRONTEND_ORIGIN`: `http://localhost:5173,https://green-pond-0f2bcd00f.5.azurestaticapps.net,https://green-pond-0f2bcd00f.azurestaticapps.net`
+   - `SCM_DO_BUILD_DURING_DEPLOYMENT`: `false` (acelera o deploy no Kudu)
 
 ---
 
