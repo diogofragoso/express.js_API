@@ -21,6 +21,12 @@ app.use(helmet({
 app.use(corsMiddleware);
 app.use(originGuard);
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/', (_req, res) => res.json({
+  message: 'API Express com Prisma 8 e RBAC',
+  status: 'ok',
+  health: '/health',
+  docs: '/api-docs',
+}));
 app.use(limiter);
 app.use('/login', loginLimiter);
 app.use(cookieParser());
