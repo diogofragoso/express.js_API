@@ -788,7 +788,7 @@
                   "codecId": "pg/int4@1",
                   "default": {
                     "kind": "literal",
-                    "value": 1
+                    "value": 2
                   },
                   "nativeType": "int4",
                   "nullable": false
@@ -837,7 +837,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "58f110737bbc1cef7712ce2393abfbd96d5ffbc0a23e2df63d5181c488aa5c34"
+    "storageHash": "a13a9d464346cfb4b792b969e3689c912d766e64389f44ccb2b6b2a5c717dd9e"
   },
   "capabilities": {
     "postgres": {

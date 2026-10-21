@@ -44,7 +44,7 @@ model User {
   email      String      @unique(map: "user_email_key")
   name       String?
   password   String
-  userTypeId Int         @default(1)
+  userTypeId Int         @default(2)
   userType   UserType    @relation(fields: [userTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "user_tipo_user_fk", index: false)
 
   @@map("user")

@@ -7,24 +7,32 @@ export interface CreateUserInput {
   email: string;
   password: string;
   name?: string;
+  userTypeId?: number;
 }
 export type UpdateUserInput = Partial<CreateUserInput>;
 type UserRow = Awaited<ReturnType<typeof db.orm.public.User.create>>;
 
+export const toPublicUser = (user: UserRow) => {
+  let role = 'aluno';
+  if (user.userTypeId === 4) role = 'admin';
+  else if (user.userTypeId === 3) role = 'professor';
 
-
-export const toPublicUser = (user: UserRow) => ({
-  id: user.id,
-  email: user.email,
-  name: user.name,
-  createdAt: user.createdAt,
-});
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    createdAt: user.createdAt,
+    userTypeId: user.userTypeId,
+    role,
+  };
+};
 
 export async function createUser(data: CreateUserInput) {
   return db.orm.public.User.create({
     email: data.email,
     name: data.name ?? null,
     password: await bcrypt.hash(data.password, 12),
+    userTypeId: data.userTypeId ?? 2,
   });
 }
 
@@ -39,7 +47,7 @@ export async function getUserById(id: number) {
 }
 
 export async function updateUser(id: number, data: UpdateUserInput) {
-  const changes: UpdateUserInput = {};
+  const changes: any = {};
   if (data.name !== undefined) changes.name = data.name;
   if (data.email !== undefined) changes.email = data.email;
   if (data.password !== undefined) changes.password = await bcrypt.hash(data.password, 12);

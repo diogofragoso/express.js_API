@@ -17,6 +17,7 @@ export const createUserBody = z.object({
   name: z.string().trim().min(2).max(100).optional(),
   email: z.string().trim().toLowerCase().max(254).pipe(z.email()),
   password,
+  userTypeId: z.union([z.literal(2), z.literal(3)]).optional().default(2),
 }).strict();
 
 export const updateUserBody = createUserBody.partial().refine(
