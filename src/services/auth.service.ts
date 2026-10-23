@@ -18,6 +18,6 @@ export class AuthService {
       issuer: 'express-tutorial',
       audience: 'express-api',
     });
-    return { token, user: toPublicUser(user) };
+    return { token, user: await toPublicUser(user) };
   }
 }

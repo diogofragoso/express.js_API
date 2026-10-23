@@ -16,6 +16,9 @@ import { authMiddleware, requireSelf } from '../middlewares/auth.middleware.js';
  *         email: { type: string, format: email }
  *         name: { type: string, nullable: true }
  *         createdAt: { type: string, format: date-time }
+ *         userTypeId: { type: integer }
+ *         userTypeCode: { type: string }
+ *         role: { type: string }
  *     CreateUser:
  *       type: object
  *       additionalProperties: false
@@ -28,6 +31,11 @@ import { authMiddleware, requireSelf } from '../middlewares/auth.middleware.js';
  *           format: password
  *           minLength: 8
  *           description: Máximo de 72 bytes em UTF-8.
+ *         userTypeCode:
+ *           type: string
+ *           enum: ['1', '2']
+ *           default: '1'
+ *           description: Código textual em tipo_user, "1" = aluno, "2" = professor. O código "3" (admin) não é permitido no cadastro público.
  *     UpdateUser:
  *       type: object
  *       additionalProperties: false

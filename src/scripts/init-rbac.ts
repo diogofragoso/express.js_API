@@ -3,21 +3,20 @@ import { db } from '../prisma/db.js';
 
 try {
   const types = [
-    { id: 1, code: 'ALUNO', name: 'Estudante' },
-    { id: 2, code: 'ADMIN', name: 'Administração' },
+    { code: '1', name: 'Estudante' },
+    { code: '2', name: 'Professor' },
+    { code: '3', name: 'Administração' },
   ];
   for (const type of types) {
-    const byId = await db.orm.public.UserType.first({ id: type.id });
-    const byCode = await db.orm.public.UserType.first({ code: type.code });
-    if ((byId && byId.code !== type.code) || (byCode && byCode.id !== type.id)) {
-      throw new Error('Catálogo de tipos conflitante. Revise os IDs antes de continuar.');
-    }
-    if (!byId) await db.orm.public.UserType.create(type);
+    const existing = await db.orm.public.UserType.first({ code: type.code });
+    if (!existing) await db.orm.public.UserType.create(type);
   }
+  const aluno = await db.orm.public.UserType.first({ code: '1' });
+  if (!aluno) throw new Error('Tipo de aluno (código 1) não encontrado.');
   let updated = 0;
   for (const user of await db.orm.public.User.all()) {
     if (user.userTypeId === null) {
-      await db.orm.public.User.where({ id: user.id }).update({ userTypeId: 1 });
+      await db.orm.public.User.where({ id: user.id }).update({ userTypeId: aluno.id });
       updated++;
     }
   }

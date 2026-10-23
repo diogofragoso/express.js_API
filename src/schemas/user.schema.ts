@@ -17,10 +17,10 @@ export const createUserBody = z.object({
   name: z.string().trim().min(2).max(100).optional(),
   email: z.string().trim().toLowerCase().max(254).pipe(z.email()),
   password,
-  userTypeId: z.union([z.literal(2), z.literal(3)]).optional().default(2),
+  userTypeCode: z.enum(['1', '2']).optional().default('1'),
 }).strict();
 
-export const updateUserBody = createUserBody.partial().refine(
+export const updateUserBody = createUserBody.omit({ userTypeCode: true }).partial().refine(
   value => Object.keys(value).length > 0,
   'Informe pelo menos um campo.',
 );

@@ -3,8 +3,8 @@ import { db } from '../prisma/db.js';
 
 try {
   const [emailArg, code, ...extra] = process.argv.slice(2);
-  if (!emailArg || (code !== 'ALUNO' && code !== 'ADMIN') || extra.length > 0) {
-    throw new Error('Uso: npx tsx src/scripts/set-user-role.ts email ALUNO|ADMIN');
+  if (!emailArg || (code !== '1' && code !== '2' && code !== '3') || extra.length > 0) {
+    throw new Error('Uso: npx tsx src/scripts/set-user-role.ts email 1|2|3');
   }
   const user = await db.orm.public.User.first({ email: emailArg.trim().toLowerCase() });
   const type = await db.orm.public.UserType.first({ code });

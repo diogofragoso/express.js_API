@@ -7,15 +7,17 @@ export interface CreateUserInput {
   email: string;
   password: string;
   name?: string;
-  userTypeId?: number;
+  userTypeCode?: '1' | '2';
 }
-export type UpdateUserInput = Partial<CreateUserInput>;
+export type UpdateUserInput = Partial<Omit<CreateUserInput, 'userTypeCode'>>;
 type UserRow = Awaited<ReturnType<typeof db.orm.public.User.create>>;
 
-export const toPublicUser = (user: UserRow) => {
-  let role = 'aluno';
-  if (user.userTypeId === 4) role = 'admin';
-  else if (user.userTypeId === 3) role = 'professor';
+export const toPublicUser = async (user: UserRow) => {
+  const type = await db.orm.public.UserType.first({ id: user.userTypeId });
+  if (!type) throw new HttpError(500, 'Tipo de usuário não encontrado.');
+  const roles: Record<string, string> = { '1': 'aluno', '2': 'professor', '3': 'admin' };
+  const role = roles[type.code];
+  if (!role) throw new HttpError(500, 'Código de tipo de usuário desconhecido.');
 
   return {
     id: user.id,
@@ -23,16 +25,19 @@ export const toPublicUser = (user: UserRow) => {
     name: user.name,
     createdAt: user.createdAt,
     userTypeId: user.userTypeId,
+    userTypeCode: type.code,
     role,
   };
 };
 
 export async function createUser(data: CreateUserInput) {
+  const type = await db.orm.public.UserType.first({ code: data.userTypeCode ?? '1' });
+  if (!type) throw new HttpError(400, 'Tipo de usuário não cadastrado.');
   return db.orm.public.User.create({
     email: data.email,
     name: data.name ?? null,
     password: await bcrypt.hash(data.password, 12),
-    userTypeId: data.userTypeId ?? 2,
+    userTypeId: type.id,
   });
 }
 

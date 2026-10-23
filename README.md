@@ -224,3 +224,13 @@ Confira o banco e aplique migrações revisadas conforme o capítulo 11 antes de
 [Prisma ORM](https://www.prisma.io/docs/orm/core-concepts) · [Express](https://expressjs.com/) · [TypeScript](https://www.typescriptlang.org/) · [Zod](https://zod.dev/) · [Vitest](https://vitest.dev/) · [Plop](https://plopjs.com/documentation/)
 
 A apresentação usa recursos renderizados pelo GitHub: títulos e sumário, tabelas, blocos com realce de sintaxe, avisos em português, listas de tarefas, diagramas Mermaid, imagens de badges e seções recolhíveis. Os avisos usam citações e títulos em negrito para exibir **Atenção**, **Importante**, **Observação** e **Dica** em português. Não depende de JavaScript ou CSS personalizado.
+
+## Cadastro por código de tipo
+
+Envie `POST /users` com `Content-Type: application/json`:
+
+```json
+{"name":"João Silva","email":"joao@example.com","password":"MinhaSenha123","userTypeCode":"1"}
+```
+
+`userTypeCode` aceita `"1"` (aluno, padrão) ou `"2"` (professor). O backend consulta `tipo_user.code` e salva o ID correspondente. `userTypeId` no cadastro é rejeitado. Tipo ausente no catálogo retorna 400; sucesso retorna 201 com `userTypeId`, `userTypeCode` e `role`, sem senha. A atualização de conta não permite trocar o tipo. O script `src/scripts/init-rbac.ts` do backend prepara os códigos textuais "1" (aluno), "2" (professor) e "3" (admin), preservando IDs existentes. O código "3" (admin) não é aceito no cadastro público. Exemplos que omitem o tipo usam "1" (aluno).

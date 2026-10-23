@@ -1,5 +1,7 @@
 <!-- Documento: docs/13-controle-de-acesso-com-rbac.md -->
 
+> Contrato atual: `tipo_user.code` é texto numérico: `"1"` = aluno, `"2"` = professor e `"3"` = admin. Os IDs são independentes (no catálogo informado: 2, 3 e 4). Os exemplos ALUNO/ADMIN deste capítulo são históricos; use os scripts atuais em `src/scripts` e o contrato de cadastro no README. `POST /users` recebe `userTypeCode`, nunca o ID.
+
 # 13 · Controle de acesso por tipo de usuário com RBAC
 
 [← Anterior](12-guia-pratico-de-typescript.md) · [Índice](../README.md) · **Etapa 13 de 14** · [Próxima →](14-front-end-react-rbac.md)
